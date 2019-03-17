@@ -9,7 +9,7 @@
 Retrieve an individual workflow by its unique ID.
 
 ### POST /project/:vcs-type/:username/:project/pipeline
-Trigger a new pipeline run on a project. This endpoint will also soon have the ability to pass parameters available during configuration processing as well as the ablity to trigger a particular branch and/or a particular workflow in your configuration.
+Trigger a new pipeline run on a project. This endpoint will also soon have the ability to [pass parameters available during configuration processing](pipeline-parameters.md) as well as the ablity to trigger a particular branch and/or a particular workflow in your configuration.
 
 ### GET /pipeline/:id
 Retrieve a particular pipeline by its unique ID. This will return basic information about the pipeline, including triggering information and the IDs of running workflows associated with the pipeline. Please note that workflows are created asyncronously to the creation of a pipeline, so in automated scripts if you trigger a pipeline it may not immediately have knowledge of all workflows that will be run as a result of your trigger. You may need to make subsequent, delayed requests to get all workflow IDs. In most cases this should be a matter of a few seconds, but in some situations the queues between our pipeline ingestion machinery and our workflows conductor can take longer to proceed.

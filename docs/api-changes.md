@@ -31,3 +31,6 @@ Note that 'build cache' is a concept from legacy CircleCI. Caches in our new pla
 
 ### GET /recent-builds
 This will be replaced by the ability to retrieve recent pipelines.
+
+## Other changes in v2
+* If you do not provide an ACCEPT header, the v2 API will return JSON. This is a change from 1.1, which would default to EDN.

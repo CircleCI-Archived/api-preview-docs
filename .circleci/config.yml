@@ -5,7 +5,7 @@ orbs:
 
 jobs:
   validate:
-    executor: build-tools/default
+    executor: build-tools/ci-base
     steps:
       - run: npm install -g swagger-cli
       - run: swagger-cli validate v2.  

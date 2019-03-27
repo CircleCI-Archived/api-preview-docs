@@ -21,7 +21,7 @@ paths:
   /workflow/{id}:
     get:
       summary: Return summary fields of a workflow by ID
-      operationID: GET workflow by ID
+      operationId: GET workflow by ID
       parameters:
         - name: id
           in: path

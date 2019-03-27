@@ -13,7 +13,7 @@ paths:
       operationId: me
       responses:
         '200':
-          description: A map of user informations
+          description: A map of simple user information
           content:
             application/json:
               schema:
@@ -30,6 +30,13 @@ paths:
           schema:
             type: string
             format: uuid
+      responses:
+        '200':
+          description: An object with workflow information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
   /workflow/{id}/jobs:
     get:
       summary: Return all the known jobs of a given workflow
@@ -42,7 +49,13 @@ paths:
           schema:
             type: string
             format: uuid
-
+      responses:
+        '200':
+          description: a paginated set of a workflow's jobs as an inverted adjacency list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowJobs"
 components:
   schemas:
     Me:
@@ -52,6 +65,10 @@ components:
           type: string
         name:
           type: string
+    Workflow:
+      type: object
+    WorkflowJobs:
+      type: array
     Error:
       required:
         - code

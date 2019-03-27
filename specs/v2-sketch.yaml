@@ -1,0 +1,46 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: CircleCI API v2
+  license:
+    name: MIT
+servers:
+  - url: http://circleci.com/api/v2
+paths:
+  /me:
+    get:
+      summary: Return basic user information of the owner of the requested token
+      operationId: me
+      responses:
+        '200':
+          description: A map of user informations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Me:
+      type: object
+      properties:
+        login:
+          type: string
+        name:
+          type: string
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

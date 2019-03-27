@@ -40,6 +40,7 @@ paths:
   /workflow/{id}/jobs:
     get:
       summary: Return all the known jobs of a given workflow
+      operationId: GET workflow jobs by ID
       parameters:
         - name: id
           in: path

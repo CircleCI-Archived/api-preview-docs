@@ -7,7 +7,7 @@ jobs:
   validate:
     executor: tools/default
     steps:
-      - run: npm install -g swagger-cli
+      - run: sudo npm install -g swagger-cli
       - run: swagger-cli validate v2-sketch.yaml
 
 workflows:

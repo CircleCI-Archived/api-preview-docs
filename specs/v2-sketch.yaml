@@ -18,12 +18,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+  /workflow/{id}:
+    get:
+      summary: Return summary fields of a workflow by ID
+      operationID: GET workflow by ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the workflow
+          required: true
+          schema:
+            type: string
+            format: uuid
+  /workflow/{id}/jobs:
+    get:
+      summary: Return all the known jobs of a given workflow
+      operationID: GET workflow jobs by ID
+      parameters:
+        - name: id
+          in: path
+          description: ID of the workflow
+          required: true
+          schema:
+            type: string
+            format: uuid
 
 components:
   schemas:

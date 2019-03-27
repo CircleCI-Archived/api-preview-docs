@@ -3,10 +3,14 @@ version: 2.1
 orbs:
   build-tools: circleci/build-tools@volatile
 
-
 jobs:
   validate:
     executor: builds-tools/default
     steps:
       - npm install -g swagger-cli
       - swagger-cli validate v2.  
+
+workflows:
+  main:
+    jobs:
+      - validate

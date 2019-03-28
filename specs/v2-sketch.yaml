@@ -107,7 +107,21 @@ components:
       properties:
         type:
           type: string
-          enum: ["webhook", "schedule"]
+          enum: ["webhook", "api", "schedule"]
+        actor:
+          $ref: "#/components/schemas/Actor"
+        vcs:
+          type: object
+          properties:
+            branch:
+              type: object
+              properties:
+                name:
+                  type: string
+                default_branch:
+                  type: boolean
+            commit:
+              type: string
     Workflow:
       type: object
       required:

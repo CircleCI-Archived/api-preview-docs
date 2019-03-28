@@ -103,6 +103,7 @@ components:
           format: uuid
         pipeline_number:
           type: number
+          format: integer
         project:
           $ref: "#/components/schemas/Project"
         trigger:

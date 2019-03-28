@@ -140,10 +140,10 @@ components:
           type: string
         created_at:
           type: string
-          format: dateTime
+          format: date-time
         stopped_at:
           type: string
-          format: dateTime
+          format: date-time
         pipeline_id:
           type: string
           format: uuid
@@ -206,11 +206,11 @@ components:
                  "timedout", "failed", "success"]
         start_time:
           type: string
-          format: dateTime
+          format: date-time
         # NB stop_time is not required
         stop_time:
           type: string
-          format: dateTime
+          format: date-time
         dependencies:
           type: array
           items:

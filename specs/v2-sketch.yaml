@@ -89,6 +89,7 @@ components:
         id:
           type: string
           format: uuid
+        # add a link to the project, Pat suggested we consider link headers
     Trigger:
       type: object
       properties:

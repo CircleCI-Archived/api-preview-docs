@@ -18,7 +18,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Actor"
-  /workflow/{id}:
+  /workflows/{id}:
     get:
       summary: Return summary fields of a workflow by ID
       operationId: GET workflow by ID
@@ -37,7 +37,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
-  /workflow/{id}/jobs:
+  /workflows/{id}/jobs:
     get:
       summary: Return all the known jobs of a given workflow
       operationId: GET workflow jobs by ID

@@ -132,12 +132,31 @@ components:
           format: uuid
         name:
           type: string
+        # workflows-conductor supports
+        # :build
+        # :approval
         type:
           type: string
           enum: ["build", "approval"]
+        # Full list of statuses from circle.model.build
+        # :retried
+        # :canceled
+        # :infrastructure_fail
+        # :timedout
+        # :not_run
+        # :running
+        # :failed
+        # :queued
+        # :scheduled
+        # :not_running
+        # :no_tests
+        # :fixed
+        # :success
         status:
           type: string
-          enum: ["queued", "running", "success", "failed"]
+          enum: ["not_run", "queued", "not_running", "running",
+                 "canceled", "infrastructure_fail", "retried",
+                 "timedout", "failed", "success"]
         start_time:
           type: string
           format: dateTime

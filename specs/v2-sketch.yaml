@@ -49,6 +49,17 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: page_token
+          in: query
+          description: Page token
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: Number of jobs to return per page of results, default 50
+          schema:
+            type: number
+            format: integer
       responses:
         '200':
           description: a paginated set of a workflow's jobs as an inverted adjacency list
@@ -86,6 +97,14 @@ components:
           enum: ["webhook", "schedule"]
     Workflow:
       type: object
+      required:
+        - id
+        - name
+        - created_at
+        - project
+        - trigger
+        - errors
+        - status
       properties:
         id:
           type: string

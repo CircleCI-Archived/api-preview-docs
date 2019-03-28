@@ -95,6 +95,9 @@ components:
           type: string
         name:
           type: string
+        id:
+          type: string
+          format: uuid
     Project:
       type: object
       properties:

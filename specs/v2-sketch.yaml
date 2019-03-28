@@ -17,7 +17,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Actor"
+                $ref: "#/components/schemas/Me"
   /workflows/{id}:
     get:
       summary: Return summary fields of a workflow by ID
@@ -76,6 +76,18 @@ paths:
                       $ref: "#/components/schemas/Job"
 components:
   schemas:
+    Me:
+      type: object
+      properties:
+        login:
+          type: string
+        name:
+          type: string
+        selected_email:
+          type: string
+        joined_at:
+          type: string
+          format: date-time
     Actor:
       type: object
       properties:

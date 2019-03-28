@@ -72,8 +72,51 @@ components:
           type: string
         name:
           type: string
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    Trigger:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["webhook", "schedule"]
     Workflow:
       type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        created_at:
+          type: string
+          format: dateTime
+        stopped_at:
+          type: string
+          format: dateTime
+        pipeline_id:
+          type: string
+          format: uuid
+        pipeline_number:
+          type: number
+        project:
+          $ref: "#/components/schemas/Project"
+        trigger:
+          $ref: "#/components/schemas/Trigger"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Error"
+        # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52
+        status:
+          type: string
+          enum: ["unauthorized", "error", "not_run",
+                 "running", "failing", "on_hold",
+                 "canceled", "failed", "success"]
     Job:
       type: object
       required:

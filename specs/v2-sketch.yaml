@@ -18,7 +18,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
-  /workflows/{id}:
+  /workflow/{id}:
     get:
       summary: Return summary fields of a workflow by ID
       operationId: GET workflow by ID
@@ -37,7 +37,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
-  /workflows/{id}/jobs:
+  /workflow/{id}/jobs:
     get:
       summary: Return all the known jobs of a given workflow
       operationId: GET workflow jobs by ID
@@ -77,17 +77,162 @@ paths:
 components:
   schemas:
     Me:
+      # minimise breaking changes from /api/v1.1/me
+      # See https://github.com/circleci/circle/blob/gordon/disable-build-archive/src/circle/model/user.clj#L755-L765
       type: object
       properties:
         login:
           type: string
-        name:
-          type: string
-        selected_email:
-          type: string
-        joined_at:
+        created_at:
           type: string
           format: date-time
+        name:
+          type: string
+        # no idea what `admin` really is
+        #admin:
+        # type: boolean?
+        basic_email_prefs:
+          type: string
+          enum: ["all", "smart", "none"]
+          # This is literally a map of vcs_url to {"on_dashboard": boolean, "emails": "default"}
+        projects:
+          type: object
+          example: {"https://github.com/username/my_project": {"on_dashboard": true, "emails": "smart"}}
+          additionalProperties:
+            type: object
+            properties:
+              on_dashboard:
+                type: boolean
+              emails:
+                type: string
+                enum: ["all", "smart", "none", "default"]
+        organization-prefs:
+          type: object
+          example: {"github": {"username": {"email": "username@example.com"}}}
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                email:
+                  type: string
+        trial-end:
+          type: string
+          format: date-time
+        plan:
+          type: object
+          description: I am not certain what this looks like, I'm somewhat afraid it's a Plan document.
+          deprecated: true
+        sign_in_count:
+          type: number
+          format: integer
+        first_vcs_authorized_client_id:
+          type: string
+          description: ??
+          deprecated: true
+        parallelism:
+          type: number
+          format: integer
+        dev_admin:
+          type: boolean
+          description: Not sure
+          deprecated: true
+        in_beta_program:
+          type: boolean
+        bitbucket_authorized:
+          type: boolean
+          description: This is a remnant of not being a platform, do we really want to expose it?
+          deprecated: true
+        enrolled_betas:
+          type: array
+          items:
+            type: string
+        analytics_id:
+          type: string
+          format: uuid
+          description: can we call this "id", please?
+        student:
+          type: boolean
+          default: false
+        privacy-optout:
+          type: boolean
+          description: Opt out of analytics trackers
+#concurrency
+#   Appears unused
+#
+#encrypted-heroku-api-key
+#   Nope, not including credentials, encrypted or not.
+#
+#plans
+#   Not sure what these should be
+        containers:
+          type: number
+          format: integer
+        num_projects_followed:
+          type: number
+          format: integer
+        days_left_in_trial:
+          type: number
+          format: integer
+        all_emails:
+          type: array
+          example: ["username@example.com"]
+          items:
+            type: string
+        selected_email:
+          type: string
+          example: "username@example.com"
+        avatar_url:
+          type: string
+          example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
+# github_id
+# bitbucket
+# bitbucket-authorized
+# pusher-id
+#   These all feel far too specific, should be rolled into "identities", right?
+#
+# github-oauth-scopes
+#   don't wanna include GitHub oauth scopes
+#
+# heroku-api-key
+#   Nope, not including credentials, obfuscated or not
+        identities:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              avatar_url:
+                type: string
+                example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
+              external_id:
+                anyOf:
+                  - type: string
+                  - type: number
+                example: 1234567
+              id:
+                anyOf:
+                  - type: string
+                  - type: number
+                example: 1234567
+              name:
+                type: string
+                example: "User Name"
+              user?:
+                type: boolean
+              domain:
+                type: string
+                example: "github.com"
+              type:
+                type: string
+                example: "github"
+              authorized?:
+                type: boolean
+              provider_id:
+                type: string
+                format: uuid
+              login:
+                type: string
+                example: "username"
     Actor:
       type: object
       properties:
@@ -105,7 +250,8 @@ components:
           type: string
           format: uuid
         # add a link to the project, Pat suggested we consider link headers
-    Trigger:
+    # Elide from Workflow for the time being. If we can get pipelines in weeks we don't need this. Backup plan if people shout is to put this into the Workflow response.
+    TriggerSummary:
       type: object
       properties:
         type:
@@ -123,6 +269,8 @@ components:
                   type: string
                 default_branch:
                   type: boolean
+            tag:
+              type: string
             commit:
               type: string
     Workflow:
@@ -132,7 +280,6 @@ components:
         - name
         - created_at
         - project
-        - trigger
         - errors
         - status
       properties:
@@ -147,6 +294,7 @@ components:
         stopped_at:
           type: string
           format: date-time
+        # No pipeline entity here. Avoid cycles in the graph
         pipeline_id:
           type: string
           format: uuid
@@ -155,8 +303,8 @@ components:
           format: integer
         project:
           $ref: "#/components/schemas/Project"
-        trigger:
-          $ref: "#/components/schemas/Trigger"
+        #trigger_summary:
+        #  $ref: "#/components/schemas/TriggerSummary"
         errors:
           type: array
           items:

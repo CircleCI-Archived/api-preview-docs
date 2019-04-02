@@ -305,10 +305,6 @@ components:
           $ref: "#/components/schemas/Project"
         #trigger_summary:
         #  $ref: "#/components/schemas/TriggerSummary"
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/Error"
         # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52
         status:
           type: string
@@ -367,9 +363,3 @@ components:
           items:
             type: string
             format: uuid
-    Error:
-      required:
-        - message
-      properties:
-        message:
-          type: string

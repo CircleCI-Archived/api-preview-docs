@@ -90,9 +90,6 @@ components:
           format: date-time
         name:
           type: string
-        # no idea what `admin` really is
-        #admin:
-        # type: boolean?
         basic_email_prefs:
           type: string
           enum: ["all", "smart", "none"]
@@ -118,13 +115,6 @@ components:
               properties:
                 email:
                   type: string
-        trial-end:
-          type: string
-          format: date-time
-        plan:
-          type: object
-          description: I am not certain what this looks like, I'm somewhat afraid it's a Plan document.
-          deprecated: true
         sign_in_count:
           type: number
           format: integer
@@ -132,41 +122,19 @@ components:
           type: string
           description: ??
           deprecated: true
-        parallelism:
-          type: number
-          format: integer
-        dev_admin:
-          type: boolean
-          description: Not sure
-          deprecated: true
         in_beta_program:
           type: boolean
-        bitbucket_authorized:
-          type: boolean
-          description: This is a remnant of not being a platform, do we really want to expose it?
-          deprecated: true
         enrolled_betas:
           type: array
           items:
             type: string
-        analytics_id:
+        id:
           type: string
           format: uuid
-          description: can we call this "id", please?
-        student:
-          type: boolean
-          default: false
-        privacy-optout:
+          description: User's CircleCI ID
+        privacy_optout:
           type: boolean
           description: Opt out of analytics trackers
-#concurrency
-#   Appears unused
-#
-#encrypted-heroku-api-key
-#   Nope, not including credentials, encrypted or not.
-#
-#plans
-#   Not sure what these should be
         containers:
           type: number
           format: integer
@@ -187,21 +155,17 @@ components:
         avatar_url:
           type: string
           example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
-# github_id
-# bitbucket
-# bitbucket-authorized
-# pusher-id
-#   These all feel far too specific, should be rolled into "identities", right?
-#
-# github-oauth-scopes
-#   don't wanna include GitHub oauth scopes
-#
-# heroku-api-key
-#   Nope, not including credentials, obfuscated or not
         identities:
           type: object
           additionalProperties:
             type: object
+            required:
+              - authorized?
+              - domain
+              - external_id
+              - id
+              - provider_id
+              - type
             properties:
               avatar_url:
                 type: string
@@ -235,6 +199,9 @@ components:
               login:
                 type: string
                 example: "username"
+              student:
+                type: boolean
+                default: false
     Actor:
       type: object
       properties:

@@ -56,10 +56,12 @@ paths:
             type: string
         - name: page_size
           in: query
-          description: Number of jobs to return per page of results, default 50
+          description: Number of jobs to return per page of results. This parameter may not be exposed initially.
           schema:
             type: number
             format: integer
+            minimum: 10
+            maximum: 50
       responses:
         '200':
           description: a paginated set of a workflow's jobs as an inverted adjacency list
@@ -280,7 +282,6 @@ components:
         - name
         - created_at
         - project
-        - errors
         - status
       properties:
         id:
@@ -294,6 +295,7 @@ components:
         stopped_at:
           type: string
           format: date-time
+          nullable: true
         # No pipeline entity here. Avoid cycles in the graph
         pipeline_id:
           type: string

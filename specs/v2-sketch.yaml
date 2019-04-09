@@ -120,7 +120,6 @@ components:
           format: integer
         first_vcs_authorized_client_id:
           type: string
-          description: ??
           deprecated: true
         in_beta_program:
           type: boolean
@@ -203,6 +202,7 @@ components:
                 type: boolean
                 default: false
     Actor:
+      description: "NOTE: The definition of Actor is subject to change."
       type: object
       properties:
         login:
@@ -213,6 +213,7 @@ components:
           type: string
           format: uuid
     Project:
+      description: "NOTE: The definition of Project is subject to change."
       type: object
       properties:
         id:
@@ -221,6 +222,7 @@ components:
         # add a link to the project, Pat suggested we consider link headers
     # Elide from Workflow for the time being. If we can get pipelines in weeks we don't need this. Backup plan if people shout is to put this into the Workflow response.
     TriggerSummary:
+      description: "NOTE: The definition of TriggerSummary is subject to change."
       type: object
       properties:
         type:
@@ -252,25 +254,32 @@ components:
         - status
       properties:
         id:
+          description: the workflow's unique ID.
           type: string
           format: uuid
         name:
+          description: the name of the workflow, as set in `.circleci/config.yml`
           type: string
         created_at:
+          description: when the workflow was created.
           type: string
           format: date-time
         stopped_at:
+          description: when the workflow finished running, failures of jobs can mean that the workflow stops without running all jobs.
           type: string
           format: date-time
           nullable: true
         # No pipeline entity here. Avoid cycles in the graph
         pipeline_id:
+          description: the unique ID for the pipeline that this workflow belongs to.
           type: string
           format: uuid
         pipeline_number:
+          description: the project-specific pipeline number for the pipeline that this workflow belongs to.
           type: number
           format: integer
         project:
+          description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
           $ref: "#/components/schemas/Project"
         #trigger_summary:
         #  $ref: "#/components/schemas/TriggerSummary"
@@ -291,9 +300,11 @@ components:
         - dependencies
       properties:
         id:
+          description: the job's unique ID.
           type: string
           format: uuid
         name:
+          description: the name of the job in the workflow, this may be synthesized when using job definitions from orbs.
           type: string
         # workflows-conductor supports
         # :build
@@ -316,18 +327,25 @@ components:
         # :fixed
         # :success
         status:
+          description: the job's current status.
           type: string
           enum: ["not_run", "queued", "not_running", "running",
                  "canceled", "infrastructure_fail", "retried",
-                 "timedout", "failed", "success"]
+                 "timedout", "failed", "success", "unknown"]
+        job_number:
+          description: the job's number, corresponds to the `CIRCLE_BUILD_NUM` environment variable.
+          type: number
+          format: integer
         start_time:
+          description: when the job started.
           type: string
           format: date-time
-        # NB stop_time is not required
         stop_time:
+          description: when the job finished.
           type: string
           format: date-time
         dependencies:
+          description: a list of the unique job IDs for the jobs that this job depends upon in the workflow.
           type: array
           items:
             type: string

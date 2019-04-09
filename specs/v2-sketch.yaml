@@ -18,10 +18,76 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
+  /project/{id}:
+    get:
+      summary: Return a project by ID
+      operationId: getProjectById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the project
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A project object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /pipeline/{id}:
+    get:
+      summary: Return a pipeline by ID
+      operationId: getPipelineById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pipeline
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A pipeline object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+          links:
+            ProjectFromPipeline:
+              operationId: getProjectById
+              parameters:
+                id: "$response.body#/project_id"
+            OrganizationFromPipeline:
+              operationId: getOrganizationById
+              parameters:
+                id: "$response.body#/organization_id"
+  /organization/{id}:
+    get:
+      summary: Return an organization by ID
+      operationId: getOrganizationById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the organization
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: An organization object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
   /workflow/{id}:
     get:
       summary: Return summary fields of a workflow by ID
-      operationId: GET workflow by ID
+      operationId: getWorkflowById
       parameters:
         - name: id
           in: path
@@ -37,10 +103,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
+          links:
+            ProjectFromGetWorkflow:
+              operationId: getProjectById
+              parameters:
+                id: "$response.body#/project_id"
+            WorkflowJobs:
+              operationId: getWorkflowJobsById
+              parameters:
+                id: "$response.body#/id"
   /workflow/{id}/jobs:
     get:
       summary: Return all the known jobs of a given workflow
-      operationId: GET workflow jobs by ID
+      operationId: getWorkflowJobsById
       parameters:
         - name: id
           in: path
@@ -76,6 +151,12 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Job"
+          links:
+            NextWorkflowJobPage:
+              operationId: getWorkflowJobsById
+              parameters:
+                id: "$request.query.id"
+                page_token: "$response.body#/next_page_token"
 components:
   schemas:
     Me:
@@ -212,6 +293,15 @@ components:
         id:
           type: string
           format: uuid
+        external_id:
+          type: string
+    Organization:
+      description: "NOTE: The definition of Organization is subject to change."
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
     Project:
       description: "NOTE: The definition of Project is subject to change."
       type: object
@@ -244,6 +334,57 @@ components:
               type: string
             commit:
               type: string
+    Pipeline:
+      description: "NOTE: The definition of Pipeline is subject to change."
+      type: object
+      required:
+        - id
+        - pipeline_number
+        - organization_id
+        - project_id
+        - created_at
+        - source_config
+        - idempotency_key
+        - errors
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipeline_number:
+          type: number
+          format: integer
+        organization_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        source_config:
+          type: string
+        compiled_config:
+          type: string
+        #trigger:
+        idempotency_key:
+          type: string
+        #actor:
+        updated_at:
+          type: string
+          format: date-time
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: ["config", "plan"]
+        state:
+          type: string
+          enum: ["pending", "created", "running", "canceled",
+                 "successful", "failed", "errored"]
     Workflow:
       type: object
       required:
@@ -278,9 +419,10 @@ components:
           description: the project-specific pipeline number for the pipeline that this workflow belongs to.
           type: number
           format: integer
-        project:
+        project_id:
           description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
-          $ref: "#/components/schemas/Project"
+          type: string
+          format: uuid
         #trigger_summary:
         #  $ref: "#/components/schemas/TriggerSummary"
         # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52

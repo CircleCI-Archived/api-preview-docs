@@ -309,7 +309,18 @@ components:
         id:
           type: string
           format: uuid
-        # add a link to the project, Pat suggested we consider link headers
+        vcs_slug:
+          type: string
+          enum: ["github", "bitbucket"]
+        name:
+          type: string
+          example: "api-preview-docs"
+        organization_id:
+          type: string
+          format: uuid
+        organization_name:
+          type: string
+          example: "CircleCI-Public"
     # Elide from Workflow for the time being. If we can get pipelines in weeks we don't need this. Backup plan if people shout is to put this into the Workflow response.
     TriggerSummary:
       description: "NOTE: The definition of TriggerSummary is subject to change."

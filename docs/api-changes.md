@@ -1,12 +1,21 @@
 
 # API changes compared to version 1.1
 
-## New features in API v2
+Use of the below endpoints is similar to use of the 1.1 endpoints in terms of authentication. Please refer to the main CirlceCI documentation for information on authenticating with a token.
 
-**COMING SOON**
+## NEW ENDPOINTS IN PREVIEW RELEASE
 
 ### GET /workflow/:id
 Retrieve an individual workflow by its unique ID.
+
+### GET /workflow/:id/jobs
+Retrieve the jobs of an individual workflow by its unique ID. Note that for now we're returning all jobs, but we reserve the right to paginate them in the future. The shape of the pagination will not change, but the default number of jobs may be reduced.
+
+
+## COMING SOON
+
+### GET /project/:id
+Retrieve an individual project by its unique ID.
 
 ### POST /project/:vcs-type/:username/:project/pipeline
 Trigger a new pipeline run on a project. This endpoint will also soon have the ability to [pass parameters available during configuration processing](pipeline-parameters.md) as well as the ablity to trigger a particular branch and/or a particular workflow in your configuration.
@@ -33,4 +42,4 @@ Note that 'build cache' is a concept from legacy CircleCI. Caches in our new pla
 This will be replaced by the ability to retrieve recent pipelines.
 
 ## Other changes in v2
-* If you do not provide an ACCEPT header, the v2 API will return JSON. This is a change from 1.1, which would default to EDN.
+* If you do not provide an ACCEPT header, the v2 API will return JSON. This is a change from 1.1, w hich would default to EDN.

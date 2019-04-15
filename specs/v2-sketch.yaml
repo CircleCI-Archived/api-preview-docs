@@ -37,6 +37,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
+  /pipeline/{id}:
+    get:
+      summary: Return a pipeline by ID
+      operationId: getPipelineById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pipeline
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A pipeline object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+          links:
+            ProjectFromPipeline:
+              operationId: getProjectById
+              parameters:
+                id: "$response.body#/project_id"
+            OrganizationFromPipeline:
+              operationId: getOrganizationById
+              parameters:
+                id: "$response.body#/organization_id"
   /organization/{id}:
     get:
       summary: Return an organization by ID
@@ -280,6 +308,58 @@ components:
         organization_name:
           type: string
           example: "CircleCI-Public"
+    Pipeline:
+      description: "NOTE: The definition of Pipeline is subject to change."
+      type: object
+      required:
+        - id
+        - pipeline_number
+        - organization_id
+        - project_id
+        - created_at
+        - source_config
+        - idempotency_key
+        - errors
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipeline_number:
+          type: number
+          format: integer
+        organization_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        source_config:
+          type: string
+        compiled_config:
+          type: string
+        #trigger:
+        idempotency_key:
+          type: string
+        #actor:
+        updated_at:
+          type: string
+          format: date-time
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: ["config", "plan"]
+        state:
+          type: string
+          enum: ["pending", "created", "blocked", "on_hold",
+                 "running", "canceled", "successful", "failed",
+                 "errored"]
     Workflow:
       type: object
       required:

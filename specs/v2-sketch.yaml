@@ -18,6 +18,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
+  /project/{id}:
+    get:
+      summary: Return a project by ID
+      operationId: getProjectById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the project
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A project object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /organization/{id}:
+    get:
+      summary: Return an organization by ID
+      operationId: getOrganizationById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the organization
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: An organization object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
 components:
   schemas:
     Me:
@@ -143,3 +181,29 @@ components:
               student:
                 type: boolean
                 default: false
+    Organization:
+      description: "NOTE: The definition of Organization is subject to change."
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    Project:
+      description: "NOTE: The definition of Project is subject to change."
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        vcs_slug:
+          type: string
+          enum: ["github", "bitbucket"]
+        name:
+          type: string
+          example: "api-preview-docs"
+        organization_id:
+          type: string
+          format: uuid
+        organization_name:
+          type: string
+          example: "CircleCI-Public"

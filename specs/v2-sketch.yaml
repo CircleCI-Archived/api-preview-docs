@@ -1,0 +1,469 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: CircleCI API v2
+  license:
+    name: MIT
+servers:
+  - url: http://circleci.com/api/v2
+paths:
+  /me:
+    get:
+      summary: Return basic user information of the owner of the requested token
+      operationId: me
+      responses:
+        '200':
+          description: A map of simple user information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Me"
+  /project/{id}:
+    get:
+      summary: Return a project by ID
+      operationId: getProjectById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the project
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A project object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /pipeline/{id}:
+    get:
+      summary: Return a pipeline by ID
+      operationId: getPipelineById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pipeline
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: A pipeline object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pipeline"
+          links:
+            ProjectFromPipeline:
+              operationId: getProjectById
+              parameters:
+                id: "$response.body#/project_id"
+            OrganizationFromPipeline:
+              operationId: getOrganizationById
+              parameters:
+                id: "$response.body#/organization_id"
+  /organization/{id}:
+    get:
+      summary: Return an organization by ID
+      operationId: getOrganizationById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the organization
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: An organization object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Organization"
+  /workflow/{id}:
+    get:
+      summary: Return summary fields of a workflow by ID
+      operationId: getWorkflowById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the workflow
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: An object with workflow information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+          links:
+            ProjectFromGetWorkflow:
+              operationId: getProjectById
+              parameters:
+                id: "$response.body#/project_id"
+            WorkflowJobs:
+              operationId: getWorkflowJobsById
+              parameters:
+                id: "$response.body#/id"
+  /workflow/{id}/jobs:
+    get:
+      summary: Return all the known jobs of a given workflow
+      operationId: getWorkflowJobsById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the workflow
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page_token
+          in: query
+          description: Page token
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: Number of jobs to return per page of results. This parameter may not be exposed initially.
+          schema:
+            type: number
+            format: integer
+            minimum: 10
+            maximum: 50
+      responses:
+        '200':
+          description: a paginated set of a workflow's jobs as an inverted adjacency list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  next_page_token:
+                    type: string
+                  jobs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Job"
+          links:
+            NextWorkflowJobPage:
+              operationId: getWorkflowJobsById
+              parameters:
+                id: "$request.query.id"
+                page_token: "$response.body#/next_page_token"
+components:
+  schemas:
+    Me:
+      # minimise breaking changes from /api/v1.1/me
+      # See https://github.com/circleci/circle/blob/gordon/disable-build-archive/src/circle/model/user.clj#L755-L765
+      type: object
+      properties:
+        login:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        name:
+          type: string
+        basic_email_prefs:
+          type: string
+          enum: ["all", "smart", "none"]
+          # This is literally a map of vcs_url to {"on_dashboard": boolean, "emails": "default"}
+        projects:
+          type: object
+          example: {"https://github.com/username/my_project": {"on_dashboard": true, "emails": "smart"}}
+          additionalProperties:
+            type: object
+            properties:
+              on_dashboard:
+                type: boolean
+              emails:
+                type: string
+                enum: ["all", "smart", "none", "default"]
+        organization-prefs:
+          type: object
+          example: {"github": {"username": {"email": "username@example.com"}}}
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                email:
+                  type: string
+        sign_in_count:
+          type: number
+          format: integer
+        first_vcs_authorized_client_id:
+          type: string
+          deprecated: true
+        in_beta_program:
+          type: boolean
+        enrolled_betas:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+          format: uuid
+          description: User's CircleCI ID
+        privacy_optout:
+          type: boolean
+          description: Opt out of analytics trackers
+        containers:
+          type: number
+          format: integer
+        num_projects_followed:
+          type: number
+          format: integer
+        days_left_in_trial:
+          type: number
+          format: integer
+        all_emails:
+          type: array
+          example: ["username@example.com"]
+          items:
+            type: string
+        selected_email:
+          type: string
+          example: "username@example.com"
+        avatar_url:
+          type: string
+          example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
+        identities:
+          type: object
+          additionalProperties:
+            type: object
+            required:
+              - authorized?
+              - domain
+              - external_id
+              - id
+              - provider_id
+              - type
+            properties:
+              avatar_url:
+                type: string
+                example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
+              external_id:
+                anyOf:
+                  - type: string
+                  - type: number
+                example: 1234567
+              id:
+                anyOf:
+                  - type: string
+                  - type: number
+                example: 1234567
+              name:
+                type: string
+                example: "User Name"
+              user?:
+                type: boolean
+              domain:
+                type: string
+                example: "github.com"
+              type:
+                type: string
+                example: "github"
+              authorized?:
+                type: boolean
+              provider_id:
+                type: string
+                format: uuid
+              login:
+                type: string
+                example: "username"
+              student:
+                type: boolean
+                default: false
+    Organization:
+      description: "NOTE: The definition of Organization is subject to change."
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+    Project:
+      description: "NOTE: The definition of Project is subject to change."
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        vcs_slug:
+          type: string
+          enum: ["github", "bitbucket"]
+        name:
+          type: string
+          example: "api-preview-docs"
+        organization_id:
+          type: string
+          format: uuid
+        organization_name:
+          type: string
+          example: "CircleCI-Public"
+    Pipeline:
+      description: "NOTE: The definition of Pipeline is subject to change."
+      type: object
+      required:
+        - id
+        - pipeline_number
+        - organization_id
+        - project_id
+        - created_at
+        - source_config
+        - idempotency_key
+        - errors
+      properties:
+        id:
+          type: string
+          format: uuid
+        pipeline_number:
+          type: number
+          format: integer
+        organization_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        source_config:
+          type: string
+        compiled_config:
+          type: string
+        #trigger:
+        idempotency_key:
+          type: string
+        #actor:
+        updated_at:
+          type: string
+          format: date-time
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: ["config", "plan"]
+        state:
+          type: string
+          enum: ["pending", "created", "blocked", "on_hold",
+                 "running", "canceled", "successful", "failed",
+                 "errored"]
+    Workflow:
+      type: object
+      required:
+        - id
+        - name
+        - created_at
+        - project
+        - status
+      properties:
+        id:
+          description: the workflow's unique ID.
+          type: string
+          format: uuid
+        name:
+          description: the name of the workflow, as set in `.circleci/config.yml`
+          type: string
+        created_at:
+          description: when the workflow was created.
+          type: string
+          format: date-time
+        stopped_at:
+          description: when the workflow finished running, failures of jobs can mean that the workflow stops without running all jobs.
+          type: string
+          format: date-time
+          nullable: true
+        # No pipeline entity here. Avoid cycles in the graph
+        pipeline_id:
+          description: the unique ID for the pipeline that this workflow belongs to.
+          type: string
+          format: uuid
+        pipeline_number:
+          description: the project-specific pipeline number for the pipeline that this workflow belongs to.
+          type: number
+          format: integer
+        project_id:
+          description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
+          type: string
+          format: uuid
+        #trigger_summary:
+        #  $ref: "#/components/schemas/TriggerSummary"
+        # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52
+        status:
+          type: string
+          enum: ["unauthorized", "error", "not_run",
+                 "running", "failing", "on_hold",
+                 "canceled", "failed", "success"]
+    Job:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - status
+        - start_time
+        - dependencies
+      properties:
+        id:
+          description: the job's unique ID.
+          type: string
+          format: uuid
+        name:
+          description: the name of the job in the workflow, this may be synthesized when using job definitions from orbs.
+          type: string
+        # workflows-conductor supports
+        # :build
+        # :approval
+        type:
+          type: string
+          enum: ["build", "approval"]
+        # Full list of statuses from circle.model.build
+        # :retried
+        # :canceled
+        # :infrastructure_fail
+        # :timedout
+        # :not_run
+        # :running
+        # :failed
+        # :queued
+        # :scheduled
+        # :not_running
+        # :no_tests
+        # :fixed
+        # :success
+        status:
+          description: the job's current status.
+          type: string
+          enum: ["not_run", "queued", "not_running", "running",
+                 "canceled", "infrastructure_fail", "retried",
+                 "timedout", "failed", "success", "unknown"]
+        job_number:
+          description: the job's number, corresponds to the `CIRCLE_BUILD_NUM` environment variable.
+          type: number
+          format: integer
+        start_time:
+          description: when the job started.
+          type: string
+          format: date-time
+        stop_time:
+          description: when the job finished.
+          type: string
+          format: date-time
+        dependencies:
+          description: a list of the unique job IDs for the jobs that this job depends upon in the workflow.
+          type: array
+          items:
+            type: string
+            format: uuid

@@ -56,6 +56,79 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Organization"
+  /workflow/{id}:
+    get:
+      summary: Return summary fields of a workflow by ID
+      operationId: getWorkflowById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the workflow
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: An object with workflow information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+          links:
+            ProjectFromGetWorkflow:
+              operationId: getProjectById
+              parameters:
+                id: "$response.body#/project_id"
+            WorkflowJobs:
+              operationId: getWorkflowJobsById
+              parameters:
+                id: "$response.body#/id"
+  /workflow/{id}/jobs:
+    get:
+      summary: Return all the known jobs of a given workflow
+      operationId: getWorkflowJobsById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the workflow
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page_token
+          in: query
+          description: Page token
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: Number of jobs to return per page of results. This parameter may not be exposed initially.
+          schema:
+            type: number
+            format: integer
+            minimum: 10
+            maximum: 50
+      responses:
+        '200':
+          description: a paginated set of a workflow's jobs as an inverted adjacency list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  next_page_token:
+                    type: string
+                  jobs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Job"
+          links:
+            NextWorkflowJobPage:
+              operationId: getWorkflowJobsById
+              parameters:
+                id: "$request.query.id"
+                page_token: "$response.body#/next_page_token"
 components:
   schemas:
     Me:
@@ -207,3 +280,110 @@ components:
         organization_name:
           type: string
           example: "CircleCI-Public"
+    Workflow:
+      type: object
+      required:
+        - id
+        - name
+        - created_at
+        - project
+        - status
+      properties:
+        id:
+          description: the workflow's unique ID.
+          type: string
+          format: uuid
+        name:
+          description: the name of the workflow, as set in `.circleci/config.yml`
+          type: string
+        created_at:
+          description: when the workflow was created.
+          type: string
+          format: date-time
+        stopped_at:
+          description: when the workflow finished running, failures of jobs can mean that the workflow stops without running all jobs.
+          type: string
+          format: date-time
+          nullable: true
+        # No pipeline entity here. Avoid cycles in the graph
+        pipeline_id:
+          description: the unique ID for the pipeline that this workflow belongs to.
+          type: string
+          format: uuid
+        pipeline_number:
+          description: the project-specific pipeline number for the pipeline that this workflow belongs to.
+          type: number
+          format: integer
+        project_id:
+          description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
+          type: string
+          format: uuid
+        #trigger_summary:
+        #  $ref: "#/components/schemas/TriggerSummary"
+        # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52
+        status:
+          type: string
+          enum: ["unauthorized", "error", "not_run",
+                 "running", "failing", "on_hold",
+                 "canceled", "failed", "success"]
+    Job:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - status
+        - start_time
+        - dependencies
+      properties:
+        id:
+          description: the job's unique ID.
+          type: string
+          format: uuid
+        name:
+          description: the name of the job in the workflow, this may be synthesized when using job definitions from orbs.
+          type: string
+        # workflows-conductor supports
+        # :build
+        # :approval
+        type:
+          type: string
+          enum: ["build", "approval"]
+        # Full list of statuses from circle.model.build
+        # :retried
+        # :canceled
+        # :infrastructure_fail
+        # :timedout
+        # :not_run
+        # :running
+        # :failed
+        # :queued
+        # :scheduled
+        # :not_running
+        # :no_tests
+        # :fixed
+        # :success
+        status:
+          description: the job's current status.
+          type: string
+          enum: ["not_run", "queued", "not_running", "running",
+                 "canceled", "infrastructure_fail", "retried",
+                 "timedout", "failed", "success", "unknown"]
+        job_number:
+          description: the job's number, corresponds to the `CIRCLE_BUILD_NUM` environment variable.
+          type: number
+          format: integer
+        start_time:
+          description: when the job started.
+          type: string
+          format: date-time
+        stop_time:
+          description: when the job finished.
+          type: string
+          format: date-time
+        dependencies:
+          description: a list of the unique job IDs for the jobs that this job depends upon in the workflow.
+          type: array
+          items:
+            type: string
+            format: uuid

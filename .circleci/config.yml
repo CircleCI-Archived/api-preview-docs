@@ -1,0 +1,23 @@
+parameters:
+  spec-root:
+    type: string
+    default: "./specs/"
+
+
+version: 2.1
+
+orbs:
+  tools: circleci/node@volatile
+
+jobs:
+  validate:
+    executor: tools/node
+    steps:
+      - run: sudo npm install -g swagger-cli
+      - checkout
+      - run: swagger-cli validate << pipeline.parameters.spec-root >> v2-sketch.yaml
+
+workflows:
+  main:
+    jobs:
+      - validate

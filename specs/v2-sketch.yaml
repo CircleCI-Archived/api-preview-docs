@@ -37,6 +37,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
+  /project:
+    get:
+      summary: Return a project by external ID
+      operationId: getProjectByExternalId
+      parameters:
+        - name: vcs
+          in: query
+          description: The full URL to the external VCS provider
+          required: true
+          schema:
+            type: string
+            example: "https://github.com"
+        - name: id
+          in: query
+          description: The external ID for the project on the named VCS provider
+          required: true
+          schema:
+            type: string
+            example: "1234567"
+      responses:
+        '200':
+          description: A project object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
   /pipeline/{id}:
     get:
       summary: Return a pipeline by ID

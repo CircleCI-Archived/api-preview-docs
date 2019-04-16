@@ -11,7 +11,7 @@ orbs:
 
 jobs:
   validate:
-    executor: tools/node
+    executor: tools/default
     steps:
       - run: sudo npm install -g swagger-cli
       - checkout

@@ -446,7 +446,7 @@ components:
         status:
           description: the job's current status.
           type: string
-          enum: ["unauthorized" "not_run", "queued",
+          enum: ["unauthorized", "not_run", "queued",
                  "not_running", "running", "canceled",
                  "infrastructure_fail", "retried",
                  "timedout", "failed", "success", "unknown"]

@@ -18,18 +18,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
-  /project/{id}:
+  /project/{vcs_slug}/{organization_name}/{project_name}:
     get:
-      summary: Return a project by ID
-      operationId: getProjectById
+      summary: Return a project from the triple of vcs_slug / organization_name / project_name
+      operationId: getProjectBySlugs
       parameters:
-        - name: id
+        - name: vcs_slug
           in: path
-          description: ID of the project
+          description: |
+            Identifier for the project's VCS
           required: true
           schema:
             type: string
-            format: uuid
+          example: github
+        - name: organization_name
+          in: path
+          description: |
+            Identifier for the organization the project belongs to on the specified VCS provider.
+          required: true
+          schema:
+            type: string
+          example: CircleCI-Public
+        - name: project_name
+          in: path
+          description: |
+            Project name
+          required: true
+          schema:
+            type: string
+          example: api-preview-docs
       responses:
         '200':
           description: A project object
@@ -58,32 +75,11 @@ paths:
                 $ref: "#/components/schemas/Pipeline"
           links:
             ProjectFromPipeline:
-              operationId: getProjectById
+              operationId: getProjectBySlugs
               parameters:
-                id: "$response.body#/project_id"
-            OrganizationFromPipeline:
-              operationId: getOrganizationById
-              parameters:
-                id: "$response.body#/organization_id"
-  /organization/{id}:
-    get:
-      summary: Return an organization by ID
-      operationId: getOrganizationById
-      parameters:
-        - name: id
-          in: path
-          description: ID of the organization
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: An organization object
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Organization"
+                vcs_slug: "$response.body#/vcs_slug"
+                organization_name:  "$response.body#/organization_name"
+                project_name: "$response.body#/project_name"
   /workflow/{id}:
     get:
       summary: Return summary fields of a workflow by ID
@@ -105,9 +101,11 @@ paths:
                 $ref: "#/components/schemas/Workflow"
           links:
             ProjectFromGetWorkflow:
-              operationId: getProjectById
+              operationId: getProjectBySlugs
               parameters:
-                id: "$response.body#/project_id"
+                vcs_slug: "$response.body#/vcs_slug"
+                organization_name:  "$response.body#/organization_name"
+                project_name: "$response.body#/project_name"
             WorkflowJobs:
               operationId: getWorkflowJobsById
               parameters:
@@ -282,32 +280,20 @@ components:
               student:
                 type: boolean
                 default: false
-    Organization:
-      description: "NOTE: The definition of Organization is subject to change."
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
     Project:
       description: "NOTE: The definition of Project is subject to change."
       type: object
       properties:
-        id:
-          type: string
-          format: uuid
         vcs_slug:
+          description: Slug for the VCS provider hosting the project's code
+          example: "bitbucket"
           type: string
-          enum: ["github", "bitbucket"]
-        name:
-          type: string
-          example: "api-preview-docs"
-        organization_id:
-          type: string
-          format: uuid
         organization_name:
           type: string
           example: "CircleCI-Public"
+        project_name:
+          type: string
+          example: "api-preview-docs"
     Pipeline:
       description: "NOTE: The definition of Pipeline is subject to change."
       type: object
@@ -327,12 +313,19 @@ components:
         pipeline_number:
           type: number
           format: integer
-        organization_id:
-          type: string
-          format: uuid
-        project_id:
-          type: string
-          format: uuid
+        project:
+          type: object
+          required: [vcs_slug, organization_name, project_name]
+          properties:
+            vcs_slug:
+              example: "bitbucket"
+              type: string
+            organization_name:
+              type: string
+              example: "CircleCI-Public"
+            project_name:
+              type: string
+              example: "api-preview-docs"
         created_at:
           type: string
           format: date-time
@@ -397,7 +390,6 @@ components:
         project_id:
           description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
           type: string
-          format: uuid
         #trigger_summary:
         #  $ref: "#/components/schemas/TriggerSummary"
         # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52

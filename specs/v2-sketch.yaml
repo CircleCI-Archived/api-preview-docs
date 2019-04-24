@@ -448,8 +448,8 @@ components:
           type: string
           enum: ["unauthorized", "not_run", "queued",
                  "not_running", "running", "canceled",
-                 "infrastructure_fail", "retried",
-                 "timedout", "failed", "success", "unknown"]
+                 "infrastructure_fail", "timedout",
+                 "failed", "success", "unknown"]
         job_number:
           description: the job's number, corresponds to the `CIRCLE_BUILD_NUM` environment variable.
           type: number

@@ -31,6 +31,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Project"
+  /project/{project_slug}/pipeline:
+    post:
+      summary: Trigger a new pipeline for a project
+      operationId: triggerNewPipeline
+      parameters:
+        - $ref: "#/components/parameters/ProjectSlug"
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TriggerPipelineRequest"
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TriggerPipelineRequest"
+      responses:
+        '200':
+          description: Newly created pipeline data
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - number
+                  - state
+                  - created_at
+                additionalProperties: false
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  number:
+                    type: number
+                    format: integer
+                  state:
+                    type: string
+                    enum: ["pending", "created", "errored"]
+                  created_at:
+                    type: string
+                    format: date-time
+          links:
+            TriggeredPipeline:
+              operationId: getPipelineById
+              parameters:
+                id: "$response.body#/pipeline_id"
   /pipeline/{id}:
     get:
       summary: Return a pipeline by ID
@@ -303,12 +348,28 @@ components:
         last_job_finish_time:
           type: string
           format: date-time
+    TriggerPipelineRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        branch:
+          description: The branch to run the new pipeline on. The HEAD commit on this branch will be used for the triggered pipeline, unless the `revision` parameter is also passed.
+          type: string
+          example: "feature/design-new-api"
+        revision:
+          description: The revision of code that the new pipeline is to run.
+          type: string
+          example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
+        tag:
+          description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `revision` or `branch`.
+          type: string
+          example: "v3.1.4159"
     Pipeline:
       description: "NOTE: The definition of Pipeline is subject to change."
       type: object
       required:
         - id
-        - pipeline_number
+        - number
         - organization_id
         - project_slug
         - created_at
@@ -319,7 +380,7 @@ components:
         id:
           type: string
           format: uuid
-        pipeline_number:
+        number:
           type: number
           format: integer
         project_slug:

@@ -18,35 +18,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Me"
-  /project/{vcs_slug}/{organization_name}/{project_name}:
+  /project/{project_slug}:
     get:
-      summary: Return a project from the triple of vcs_slug / organization_name / project_name
-      operationId: getProjectBySlugs
+      summary: Get a project
+      operationId: getProjectBySlug
       parameters:
-        - name: vcs_slug
-          in: path
-          description: |
-            Identifier for the project's VCS
-          required: true
-          schema:
-            type: string
-          example: github
-        - name: organization_name
-          in: path
-          description: |
-            Identifier for the organization the project belongs to on the specified VCS provider.
-          required: true
-          schema:
-            type: string
-          example: CircleCI-Public
-        - name: project_name
-          in: path
-          description: |
-            Project name
-          required: true
-          schema:
-            type: string
-          example: api-preview-docs
+        - $ref: "#/components/parameters/ProjectSlug"
       responses:
         '200':
           description: A project object
@@ -75,11 +52,9 @@ paths:
                 $ref: "#/components/schemas/Pipeline"
           links:
             ProjectFromPipeline:
-              operationId: getProjectBySlugs
+              operationId: getProjectById
               parameters:
-                vcs_slug: "$response.body#/vcs_slug"
-                organization_name:  "$response.body#/organization_name"
-                project_name: "$response.body#/project_name"
+                project_slug: "$response.body#/project_slug"
   /workflow/{id}:
     get:
       summary: Return summary fields of a workflow by ID
@@ -101,11 +76,9 @@ paths:
                 $ref: "#/components/schemas/Workflow"
           links:
             ProjectFromGetWorkflow:
-              operationId: getProjectBySlugs
+              operationId: getProjectById
               parameters:
-                vcs_slug: "$response.body#/vcs_slug"
-                organization_name:  "$response.body#/organization_name"
-                project_name: "$response.body#/project_name"
+                project_slug: "$response.body#/project_slug"
             WorkflowJobs:
               operationId: getWorkflowJobsById
               parameters:
@@ -156,6 +129,17 @@ paths:
                 id: "$request.query.id"
                 page_token: "$response.body#/next_page_token"
 components:
+  parameters:
+    ProjectSlug:
+      name: project_slug
+      in: path
+      description: |
+        Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+      required: true
+      schema:
+        type: string
+        example: "github/CircleCI-Public/api-preview-docs"
+      allowReserved: true
   schemas:
     Me:
       # minimise breaking changes from /api/v1.1/me
@@ -283,17 +267,22 @@ components:
     Project:
       description: "NOTE: The definition of Project is subject to change."
       type: object
+      required:
+        - slug
+        - vcs_url
       properties:
-        vcs_slug:
-          description: Slug for the VCS provider hosting the project's code
-          example: "bitbucket"
+        slug:
+          description: Project slug in the form `vcs-slug/org-name/repo-name`
           type: string
-        organization_name:
+          example: "bitbucket/CircleCI-Public/api-preview-docs"
+        name:
+          description: The name of the project
           type: string
-          example: "CircleCI-Public"
-        project_name:
+          example: "CircleCI-Public/api-preview-docs"
+        vcs_url:
+          description: URL to the repository hosting the project's code
           type: string
-          example: "api-preview-docs"
+          example: "https://github.com/CircleCI-Public/api-preview-docs"
     Pipeline:
       description: "NOTE: The definition of Pipeline is subject to change."
       type: object
@@ -301,7 +290,7 @@ components:
         - id
         - pipeline_number
         - organization_id
-        - project_id
+        - project_slug
         - created_at
         - source_config
         - idempotency_key
@@ -313,19 +302,8 @@ components:
         pipeline_number:
           type: number
           format: integer
-        project:
-          type: object
-          required: [vcs_slug, organization_name, project_name]
-          properties:
-            vcs_slug:
-              example: "bitbucket"
-              type: string
-            organization_name:
-              type: string
-              example: "CircleCI-Public"
-            project_name:
-              type: string
-              example: "api-preview-docs"
+        project_slug:
+          type: string
         created_at:
           type: string
           format: date-time
@@ -387,7 +365,7 @@ components:
           description: the project-specific pipeline number for the pipeline that this workflow belongs to.
           type: number
           format: integer
-        project_id:
+        project_slug:
           description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
           type: string
         #trigger_summary:

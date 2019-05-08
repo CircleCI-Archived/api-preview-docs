@@ -15,7 +15,7 @@ jobs:
     steps:
       - run: sudo npm install -g swagger-cli
       - checkout
-      - run: swagger-cli validate << pipeline.parameters.spec-root >> v2-sketch.yaml
+      - run: swagger-cli validate "<< pipeline.parameters.spec-root >>v2-sketch.yaml"
 
 workflows:
   main:

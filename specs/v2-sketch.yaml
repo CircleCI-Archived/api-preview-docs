@@ -264,12 +264,31 @@ components:
               student:
                 type: boolean
                 default: false
+    VcsInfo:
+      description: "Information about the VCS that hosts the project source code."
+      type: object
+      required:
+        - vcs_url
+        - provider
+        - default_branch
+      properties:
+        vcs_url:
+          description: URL to the repository hosting the project's code
+          type: string
+          example: "https://github.com/CircleCI-Public/api-preview-docs"
+        provider:
+          description: The VCS provider
+          type: string
+          enum: ["GitHub", "Bitbucket"]
+        default_branch:
+          type: string
+          example: "master"
     Project:
       description: "NOTE: The definition of Project is subject to change."
       type: object
       required:
         - slug
-        - vcs_url
+        - name
       properties:
         slug:
           description: Project slug in the form `vcs-slug/org-name/repo-name`
@@ -279,10 +298,11 @@ components:
           description: The name of the project
           type: string
           example: "CircleCI-Public/api-preview-docs"
-        vcs_url:
-          description: URL to the repository hosting the project's code
+        vcs_info:
+          $ref: "#/components/schemas/VcsInfo"
+        last_job_finish_time:
           type: string
-          example: "https://github.com/CircleCI-Public/api-preview-docs"
+          format: date-time
     Pipeline:
       description: "NOTE: The definition of Pipeline is subject to change."
       type: object

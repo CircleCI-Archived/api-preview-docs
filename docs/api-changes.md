@@ -25,9 +25,9 @@ Retrieve an individual workflow by its unique ID.
 Retrieve the jobs of an individual workflow by its unique ID. Note that for now we're returning all jobs, but we reserve the right to paginate them in the future. The shape of the pagination will not change, but the default number of jobs may be reduced.
 
 ### GET /project/:project_slug
-Retrieve an individual project by its unique ID.
+Retrieve an individual project by its unique slug.
 
-## COMING SOON
+## COMING SOON  
 
 ### POST /project/:project_slug/pipeline
 Trigger a new pipeline run on a project. This endpoint will also soon have the ability to [pass parameters available during configuration processing](pipeline-parameters.md) as well as the ablity to trigger a particular branch and/or a particular workflow in your configuration.

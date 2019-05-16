@@ -334,6 +334,7 @@ components:
       required:
         - slug
         - name
+        - organization_name
       properties:
         slug:
           description: Project slug in the form `vcs-slug/org-name/repo-name`
@@ -342,7 +343,11 @@ components:
         name:
           description: The name of the project
           type: string
-          example: "CircleCI-Public/api-preview-docs"
+          example: "api-preview-docs"
+        organization_name:
+          description: The name of the organization the project belongs to
+          type: string
+          example: "CircleCI-Public"
         vcs_info:
           $ref: "#/components/schemas/VcsInfo"
         last_job_finish_time:

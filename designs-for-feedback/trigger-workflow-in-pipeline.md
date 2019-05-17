@@ -31,4 +31,8 @@ workflows:
 
 The above would prevent the workflow `foo` from being triggered unless it was invoked explicitly when the pipeline is triggered.
 
+## Questions
 
+1. Is there any known use-case where we need to allow triggering multiple workflows vs. one? Assumption: no, if people want to trigger multiple workflows they can send multiple triggers.
+2. Can you combine multiple triggers, for instance using both `explicit` and `schedule` on a single workflow? Assumption: yes, the `triggers` stanza is designed to take a sequence and can accommodate all.
+3. Do we need to allow use of the `explicit` trigger on in config version 2.1 and higher? Assumption: yes.

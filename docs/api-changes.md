@@ -27,13 +27,19 @@ Retrieve the jobs of an individual workflow by its unique ID. Note that for now 
 ### GET /project/:project_slug
 Retrieve an individual project by its unique slug.
 
-## COMING SOON
-    
 ### POST /project/:project_slug/pipeline
-Trigger a new pipeline run on a project. This endpoint will also soon have the ability to [pass parameters available during configuration processing](pipeline-parameters.md) as well as the ablity to trigger a particular branch and/or a particular workflow in your configuration.
+Trigger a new pipeline run on a project.
+
+## COMING SOON
 
 ### GET /pipeline/:id
 Retrieve a particular pipeline by its unique ID. This will return basic information about the pipeline, including triggering information and the IDs of running workflows associated with the pipeline. Please note that workflows are created asyncronously to the creation of a pipeline, so in automated scripts if you trigger a pipeline it may not immediately have knowledge of all workflows that will be run as a result of your trigger. You may need to make subsequent, delayed requests to get all workflow IDs. In most cases this should be a matter of a few seconds, but in some situations the queues between our pipeline ingestion machinery and our workflows conductor can take longer to proceed.
+
+### Trigger pipeline (above) with parameters
+The `POST /project/:project_slug/pipeline` will have the ability to [pass parameters available during configuration processing](pipeline-parameters.md).
+
+### Run only a specific workflow in a triggered pipeline
+The `POST /project/:project_slug/pipeline` will have the ability to run only a specified workflow. [See the design document to provide feedback on how this will work](../designs-for-feedback/trigger-workflow-in-pipeline.mdpipeline-parameters.md).
 
 ### GET /project/:project_slug/pipelines/[:filter]
 Retrieve recent set of pipelines for a project. The shape of the filter will be documented once this endpoint is ready to be previewed. Filters may be used to retrieve pipelines for a given branch, for instance. _PREVIEW NOTE: We may change this to be more a more generic method for retrieving piplines by project, by organization, or by triggerer. If we stick with a project-oriented endpoint like this one we may not ship filters in the initial release, but we want to hear about your use cases for filtering._

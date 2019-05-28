@@ -525,5 +525,5 @@ components:
             type: string
             format: uuid
         project_slug:
-          description: slug of the job's project in the form `vcs-slug/org-name/repo-name`.
+          description: slug of the job's project in the form `vcs-slug/org-name/repo-name`, eg. `github/torvalds/linux`.
           type: string

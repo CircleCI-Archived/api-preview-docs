@@ -31,13 +31,13 @@ jobs:
 
 
 ## Passing parameters when triggering pipelines via the API
-Use the API v2 endpoint to trigger a pipeline, passing the `pipeline_parameters` key in the JSON packet in your POST body.
+Use the API v2 endpoint to trigger a pipeline, passing the `parameters` key in the JSON packet in your POST body.
 
 The example below triggers a pipeline with the parameters in the above config example (_NOTE: To pass a parameter when triggering a pipeline via the API the parameter must be declared in the configuration file._).
 
 ```
 curl -X POST --header "Content-Type: application/json" -d '{
-  "pipeline_parameters": {
+  "parameters": {
     "workingdir": "./myspecialdir",
     "image-tag": "4.8.2"
   }

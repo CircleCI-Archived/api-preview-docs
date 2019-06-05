@@ -394,15 +394,11 @@ components:
       additionalProperties: false
       properties:
         branch:
-          description: The branch to run the new pipeline on. The HEAD commit on this branch will be used for the triggered pipeline, unless the `revision` parameter is also passed.
+          description: The branch to run the new pipeline on. The HEAD commit on this branch will be used for the triggered pipeline.
           type: string
           example: "feature/design-new-api"
-        revision:
-          description: The revision of code that the new pipeline is to run.
-          type: string
-          example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
         tag:
-          description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `revision` or `branch`.
+          description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `branch`.
           type: string
           example: "v3.1.4159"
     Pipeline:

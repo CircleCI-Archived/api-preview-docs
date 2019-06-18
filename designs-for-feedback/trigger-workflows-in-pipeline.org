@@ -49,11 +49,19 @@ unless it was invoked explicitly when the pipeline is triggered with:
   }
 #+END_SRC
 
+The nested ~condition~ key is reused from job configuration, and actually accepts
+any boolean, not just pipeline parameters.
+
+~when~ would also come with an alternative of ~unless~, which inverts truthiness of
+the condition.
+
 The use of pipeline parameters has the following benefits:
 
 - Pipeline parameters are an existing feature which is planned to be used more
   widely, and thus limit the need for additional documentation and generally
-  limit the semantics of configuration through reuse
+  limit the semantics of configuration through reuse.
 - They allow custom grouping and defaults, giving users more control over the
   structure of their workflows without incurring additional complexity on our
-  side
+  side. Users could for example use an ~enum~ parameter to select just one
+  workflow out of a list in a safe manner, or reuse the same parameter for
+  several workflows which should always run together.

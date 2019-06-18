@@ -1,17 +1,17 @@
-* Request for Comment: Trigger an individual workflow
-** Problem statement
+# Request for Comment: Trigger an individual workflow
+## Problem statement
 Users want to be able to trigger a pipeline, selecting a specific workflow in
 the configuration to run. They also need a way for such manually triggered
 workflows to not always run when the pipeline is triggered without specifying a
 particular workflow.
 
-** Proposed solution
+## Proposed solution
 We will add new semantics to workflows configuration which will use pipeline
 parameters (and potentially other types of values in the future) to determine
 whether a particular workflow should run within a pipeline. Standard pipeline
 parameters can then be passed in to select which workflows should be run.
 
-** Design options for configuration of workflows
+## Design options for configuration of workflows
 If a pipeline configuration contains multiple workflows the behavior today is to
 run them both immediately upon triggering. With the ability to trigger a
 particular workflow via the API, users will likely want to be able to configure
@@ -24,38 +24,46 @@ The currently planned solution uses the existing pipeline parameters feature
 coupled with some new semantics within workflows to decide whether a workflow
 will be run.
 
-#+BEGIN_SRC yaml
-  parameters:
-    run_integration_tests:
-      type: boolean
-      default: false
+```yaml
+parameters:
+  run_integration_tests:
+    type: boolean
+    default: false
+  deploy:
+    type: boolean
+    default: false
 
-  workflows:
-    integration_tests:
-      when:
-        condition: << pipeline.parameters.run_integration_tests >>
-      jobs:
-        - tests
-#+END_SRC
+workflows:
+  integration_tests:
+    when:
+      condition: << pipeline.parameters.run_integration_tests >>
+    jobs:
+      - tests
+      - when:
+          condition: << pipeline.parameters.deploy >>
+          steps:
+            - deploy
+```
 
-The above would prevent the workflow ~integration_tests~ from being triggered
+The above would prevent the workflow `integration_tests` from being triggered
 unless it was invoked explicitly when the pipeline is triggered with:
 
-#+BEGIN_SRC json
-  {
-      "parameters": {
-          "run_integration_tests": true
-      }
-  }
-#+END_SRC
+```json
+{
+    "parameters": {
+        "run_integration_tests": true
+    }
+}
+```
 
-The nested ~condition~ key is reused from job configuration, and actually accepts
-any boolean, not just pipeline parameters. It is needed to signify that this
-value is evaluated at configuration compilation time, as opposed to a possible
-future addition that could be evaluated at run time.
+The nested `condition` key is reused from job configuration as can be seen below
+for the `deploy` job, and actually accepts any boolean, not just pipeline
+parameters. It is needed to signify that this value is evaluated at
+configuration compilation time, as opposed to a possible future addition that
+could be evaluated at run time.
 
-~when~ would also come with an alternative of ~unless~, which inverts truthiness of
-the condition.
+`when` would also come with an alternative of `unless`, which inverts truthiness
+of the condition.
 
 The use of pipeline parameters has the following benefits:
 
@@ -64,6 +72,5 @@ The use of pipeline parameters has the following benefits:
   limit the semantics of configuration through reuse.
 - They allow custom grouping and defaults, giving users more control over the
   structure of their workflows without incurring additional complexity on our
-  side. Users could for example use an ~enum~ parameter to select just one
-  workflow out of a list in a safe manner, or reuse the same parameter for
-  several workflows which should always run together.
+  side. Users could for example reuse the same parameter for several workflows
+  which should always run together.

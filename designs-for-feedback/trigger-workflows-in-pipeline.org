@@ -50,7 +50,9 @@ unless it was invoked explicitly when the pipeline is triggered with:
 #+END_SRC
 
 The nested ~condition~ key is reused from job configuration, and actually accepts
-any boolean, not just pipeline parameters.
+any boolean, not just pipeline parameters. It is needed to signify that this
+value is evaluated at configuration compilation time, as opposed to a possible
+future addition that could be evaluated at run time.
 
 ~when~ would also come with an alternative of ~unless~, which inverts truthiness of
 the condition.

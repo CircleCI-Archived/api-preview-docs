@@ -401,6 +401,12 @@ components:
           description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `branch`.
           type: string
           example: "v3.1.4159"
+        parameters:
+          description: A JSON object containing pipeline-wide parameters.
+          type: object
+          additionalProperties: true
+          default: {}
+          example: {"foo": "bar", "baz": true}
     Pipeline:
       description: "NOTE: The definition of Pipeline is subject to change."
       type: object

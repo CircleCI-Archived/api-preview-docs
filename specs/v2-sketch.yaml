@@ -404,7 +404,11 @@ components:
         parameters:
           description: A JSON object containing pipeline-wide parameters.
           type: object
-          additionalProperties: true
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
           default: {}
           example: {"foo": "bar", "baz": true}
     Pipeline:

@@ -4,7 +4,7 @@ Pipeline parameters are new with API v2. To use pipeline parameters you must use
 
 ## Declaring and using pipeline parameters in configuration
 
-Pipeline parameters are declared using a `parameters` stanza in the top level  keys of your `.circleci/config.yml` file. You can then reference the value of the parameter as a config variable in the scope `pipelines.parameters`. 
+Pipeline parameters are declared using a `parameters` stanza in the top level  keys of your `.circleci/config.yml` file. You can then reference the value of the parameter as a config variable in the scope `pipeline.parameters`. 
 
 The example belows shows a config with two pipeline parameters, `image-tag` and `workingdir` both used on the subsequent config stanzas:
 
@@ -21,23 +21,23 @@ parameters:
 jobs:
   build:
     docker:
-      - image: circleci/node:<< pipelines.parameters.image-tag >>
+      - image: circleci/node:<< pipeline.parameters.image-tag >>
     environment:
-      IMAGETAG: << pipelines.parameters.image-tag >>
-    working_directory: << pipelines.parameters.workingdir >>
+      IMAGETAG: << pipeline.parameters.image-tag >>
+    working_directory: << pipeline.parameters.workingdir >>
     steps:
       - echo "Image tag used was ${IMAGETAG}"
 ```
 
 
 ## Passing parameters when triggering pipelines via the API
-Use the API v2 endpoint to trigger a pipeline, passing the `pipeline_parameters` key in the JSON packet in your POST body.
+Use the API v2 endpoint to trigger a pipeline, passing the `parameters` key in the JSON packet in your POST body.
 
 The example below triggers a pipeline with the parameters in the above config example (_NOTE: To pass a parameter when triggering a pipeline via the API the parameter must be declared in the configuration file._).
 
 ```
 curl -X POST --header "Content-Type: application/json" -d '{
-  "pipeline_parameters": {
+  "parameters": {
     "workingdir": "./myspecialdir",
     "image-tag": "4.8.2"
   }

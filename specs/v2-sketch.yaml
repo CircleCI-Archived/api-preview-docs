@@ -100,6 +100,42 @@ paths:
               operationId: getProjectById
               parameters:
                 project_slug: "$response.body#/project_slug"
+  /pipeline/{id}/config:
+    get:
+      summary: Return a pipeline's configuration
+      operationId: getPipelineConfigById
+      parameters:
+        - name: id
+          in: path
+          description: ID of the pipeline
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The pipeline's configuration strings
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - source
+                  - compiled
+                properties:
+                  source:
+                    description: |
+                      The source config for the pipeline, before any config
+                      compilation has been performed. If there is no config
+                      this field will be empty.
+                    type: string
+                  compiled:
+                    description: |
+                      The compiled config for the pipeline, after all orb
+                      expansion has been performed. If there were errors
+                      processing the pipeline's configuration this field may be
+                      empty.
+                    type: string
   /workflow/{id}:
     get:
       summary: Return summary fields of a workflow by ID
@@ -358,17 +394,23 @@ components:
       additionalProperties: false
       properties:
         branch:
-          description: The branch to run the new pipeline on. The HEAD commit on this branch will be used for the triggered pipeline, unless the `revision` parameter is also passed.
+          description: The branch to run the new pipeline on. The HEAD commit on this branch will be used for the triggered pipeline.
           type: string
           example: "feature/design-new-api"
-        revision:
-          description: The revision of code that the new pipeline is to run.
-          type: string
-          example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
         tag:
-          description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `revision` or `branch`.
+          description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `branch`.
           type: string
           example: "v3.1.4159"
+        parameters:
+          description: A JSON object containing pipeline-wide parameters.
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: integer
+              - type: boolean
+          default: {}
+          example: {"foo": "bar", "baz": true}
     Pipeline:
       description: "NOTE: The definition of Pipeline is subject to change."
       type: object
@@ -378,7 +420,6 @@ components:
         - organization_id
         - project_slug
         - created_at
-        - source_config
         - idempotency_key
         - errors
       properties:
@@ -393,11 +434,54 @@ components:
         created_at:
           type: string
           format: date-time
-        source_config:
-          type: string
-        compiled_config:
-          type: string
-        #trigger:
+        trigger:
+          $ref: "#/components/schemas/TriggerSummary"
+        vcs:
+          description: VCS information for the pipeline
+          type: object
+          required:
+            - provider_name
+            - origin_repository_url
+            - target_repository_url
+            - revision
+          properties:
+            provider_name:
+              description: Name of the VCS provider
+              type: string
+              example: GitHub
+            origin_repository_url:
+              description: |
+                URL for the repository the trigger originated from. For fork-PR
+                pipelines this is the URL to the fork, for other pipelines the
+                `origin_` and `target_repository_url`s will be the same.
+              type: string
+              example: "https://github.com/CircleCI-Public/api-preview-docs"
+            target_repository_url:
+              description: |
+                URL for the repository the trigger targets (i.e. the repository
+                the PR will be merged into). For fork-PR pipelines this is the
+                URL to the parent repo, for other pipelines the `origin_` and
+                `target_repository_url`s will be the same.
+              type: string
+              example: "https://github.com/CircleCI-Public/api-preview-docs"
+            branch:
+              description: |
+                The branch the pipeline ran on. The HEAD commit on this branch
+                was used for the pipeline. `branch` and `tag` are mutually
+                exclusive.
+              type: string
+              example: "feature/design-new-api"
+            tag:
+              description: |
+                The tag the pipeline ran. The commit that this tag points to
+                was used for the pipeline. `branch` and `tag` are mutually
+                exclusive.
+              type: string
+              example: "v3.1.4159"
+            revision:
+              description: The revision of code that the pipeline ran.
+              type: string
+              example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
         idempotency_key:
           type: string
         #actor:
@@ -454,8 +538,6 @@ components:
         project_slug:
           description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
           type: string
-        #trigger_summary:
-        #  $ref: "#/components/schemas/TriggerSummary"
         # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52
         status:
           type: string
@@ -527,3 +609,17 @@ components:
         project_slug:
           description: slug of the job's project in the form `vcs-slug/org-name/repo-name`, eg. `github/torvalds/linux`.
           type: string
+    TriggerSummary:
+      type: object
+      required:
+        - type
+        - received_at
+      properties:
+        type:
+          description: The type of the trigger
+          type: string
+          enum: ["explicit", "webhook"]
+        received_at:
+          description: The timestamp that the trigger was received at.
+          type: string
+          format: date-time

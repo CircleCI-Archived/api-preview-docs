@@ -30,10 +30,15 @@ Retrieve an individual project by its unique slug.
 ### POST /project/:project_slug/pipeline
 Trigger a new pipeline run on a project.
 
-## COMING SOON
-
 ### GET /pipeline/:id
 Retrieve a particular pipeline by its unique ID. This will return basic information about the pipeline, including triggering information and the IDs of running workflows associated with the pipeline. Please note that workflows are created asyncronously to the creation of a pipeline, so in automated scripts if you trigger a pipeline it may not immediately have knowledge of all workflows that will be run as a result of your trigger. You may need to make subsequent, delayed requests to get all workflow IDs. In most cases this should be a matter of a few seconds, but in some situations the queues between our pipeline ingestion machinery and our workflows conductor can take longer to proceed.
+
+### GET /pipeline/:id/config
+Retrieve the configuration (both the source and compiled versions) for a given pipeline.
+
+## COMING SOON
+
+
 
 ### Trigger pipeline (above) with parameters
 The `POST /project/:project_slug/pipeline` will have the ability to [pass parameters available during configuration processing](pipeline-parameters.md).

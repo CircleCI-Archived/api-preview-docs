@@ -22,9 +22,12 @@ circumstances certain workflows in a configuration should be run.
 
 The currently planned solution uses the existing pipeline parameters feature
 coupled with some new semantics within workflows to decide whether a workflow
-will be run.
+will be run. This feature requires pipelines to be enabled on the project, and a
+configuration of version 2.1 (or newer).
 
 ```yaml
+version: 2.1
+
 parameters:
   run_integration_tests:
     type: boolean
@@ -34,15 +37,18 @@ parameters:
     default: false
 
 workflows:
+  version: 2
   integration_tests:
-    when:
-      condition: << pipeline.parameters.run_integration_tests >>
+    when: << pipeline.parameters.run_integration_tests >>
     jobs:
       - tests
       - when:
           condition: << pipeline.parameters.deploy >>
           steps:
             - deploy
+            
+jobs:
+  ...
 ```
 
 The above would prevent the workflow `integration_tests` from being triggered

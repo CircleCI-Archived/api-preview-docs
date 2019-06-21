@@ -39,8 +39,7 @@ parameters:
 workflows:
   version: 2
   integration_tests:
-    when:
-      condition: << pipeline.parameters.run_integration_tests >>
+    when: << pipeline.parameters.run_integration_tests >>
     jobs:
       - tests
       - when:

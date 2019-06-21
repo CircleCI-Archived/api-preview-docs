@@ -46,7 +46,7 @@ paths:
             schema:
               $ref: "#/components/schemas/TriggerPipelineRequest"
       responses:
-        '200':
+        '202':
           description: Newly created pipeline data
           content:
             application/json:

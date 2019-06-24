@@ -303,7 +303,7 @@ components:
           additionalProperties:
             type: object
             required:
-              - authorized?
+              - is_authorized
               - domain
               - external_id
               - id
@@ -326,7 +326,7 @@ components:
               name:
                 type: string
                 example: "User Name"
-              user?:
+              is_user:
                 type: boolean
               domain:
                 type: string
@@ -334,7 +334,7 @@ components:
               type:
                 type: string
                 example: "github"
-              authorized?:
+              is_authorized:
                 type: boolean
               provider_id:
                 type: string

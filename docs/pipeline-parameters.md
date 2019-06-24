@@ -37,14 +37,12 @@ Use the API v2 endpoint to trigger a pipeline, passing the `parameters` key in t
 The example below triggers a pipeline with the parameters in the above config example (_NOTE: To pass a parameter when triggering a pipeline via the API the parameter must be declared in the configuration file._).
 
 ```
-curl -X POST --header "Content-Type: application/json" -d '{
+curl -u ${CIRCLECI_TOKEN}: -X POST --header "Content-Type: application/json" -d '{
   "parameters": {
     "workingdir": "./myspecialdir",
     "image-tag": "4.8.2"
   }
-}
-
-https://circleci.com/api/v2/project/:vcs-type/:username/:project/pipeline?circle-token=:token
+}' https://circleci.com/api/v2/project/:vcs-type/:username/:project/pipeline
 ```
 
 ## The scope of pipeline parameters

@@ -16,7 +16,7 @@ parameters:
     default: "latest"
   workingdir:
     type: string
-    default: "./main"
+    default: "~/main"
 
 jobs:
   build:
@@ -26,7 +26,8 @@ jobs:
       IMAGETAG: << pipeline.parameters.image-tag >>
     working_directory: << pipeline.parameters.workingdir >>
     steps:
-      - echo "Image tag used was ${IMAGETAG}"
+      - run: echo "Image tag used was ${IMAGETAG}"
+      - run: echo "$(pwd) == << pipeline.parameters.workingdir >>"
 ```
 
 

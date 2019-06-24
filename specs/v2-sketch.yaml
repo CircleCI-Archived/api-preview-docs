@@ -5,7 +5,11 @@ info:
   license:
     name: MIT
 servers:
-  - url: http://circleci.com/api/v2
+  - url: https://circleci.com/api/v2
+security:
+  - api_key_query: []
+  - api_key_header: []
+  - basic_auth: []
 paths:
   /me:
     get:
@@ -210,6 +214,19 @@ paths:
                 id: "$request.query.id"
                 page_token: "$response.body#/next_page_token"
 components:
+  securitySchemes:
+    api_key_query:
+      type: "apiKey"
+      name: "circle-token"
+      in: "query"
+    api_key_header:
+      type: "apiKey"
+      name: "Circle-Token"
+      in: "header"
+    basic_auth:
+      description: "HTTP basic authentication. The username should be set as the circle-token value, and the password should be left blank."
+      type: "http"
+      scheme: "basic"
   parameters:
     ProjectSlug:
       name: project_slug

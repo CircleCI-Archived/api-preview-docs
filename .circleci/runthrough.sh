@@ -3,12 +3,17 @@
 #********************
 # VARIABLES
 # *******************
+
+# CHANGE THESE TO REFLECT YOUR PROJECT
+# AND THE PARAMETERS YOU WANT TO SEND
+project_slug="gh/ndintenfass/scratch"
+parameter_map='{"workingdir": "~/myspecialdir", "image-tag": "4.8.2"}'
+
+# YOU LIKELY DO NOT NEED TO EDIT THESE
 path_to_cli_config='~/.circleci/cli.yml'
 circleci_root='https://circleci.com/'
 api_root="${circleci_root}api/v2/"
 cli_config_path="${HOME}/.circleci/cli.yml"
-project_slug="gh/ndintenfass/scratch"
-parameter_map='{"workingdir": "~/myspecialdir", "image-tag": "4.8.2"}'
 # branch="tryapi"
 
 #********************

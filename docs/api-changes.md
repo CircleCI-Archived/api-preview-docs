@@ -47,7 +47,7 @@ Retrieve the configuration (both the source and compiled versions) for a given p
 
 ## COMING SOON 
 ### Run only a specific workflow in a triggered pipeline
-The `POST /project/:project_slug/pipeline` will have the ability to run only a specified workflow. [See the design document to provide feedback on how this will work](../designs-for-feedback/trigger-workflow-in-pipeline.md).
+The `POST /project/:project_slug/pipeline` will have the ability to run only a specified workflow. [See the design document to provide feedback on how this will work](../designs-for-feedback/trigger-workflows-in-pipeline.md).
 
 ### GET /project/:project_slug/pipelines/[:filter]
 Retrieve recent set of pipelines for a project. The shape of the filter will be documented once this endpoint is ready to be previewed. Filters may be used to retrieve pipelines for a given branch, for instance. _PREVIEW NOTE: We may change this to be more a more generic method for retrieving piplines by project, by organization, or by triggerer. If we stick with a project-oriented endpoint like this one we may not ship filters in the initial release, but we want to hear about your use cases for filtering._

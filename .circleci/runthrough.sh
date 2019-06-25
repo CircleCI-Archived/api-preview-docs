@@ -16,6 +16,7 @@ api_root="${circleci_root}api/v2/"
 cli_config_path="${HOME}/.circleci/cli.yml"
 # branch="tryapi"
 
+
 #********************
 # FUNCTIONS
 # *******************
@@ -65,9 +66,9 @@ error () {
 require_command () {
   cli_exists=$(which $1)
   if [[ -z $cli_exists ]]; then
-    error "${1} is required, and you don't seem to have it. Aborting because this script won't work without ${1}."
+    error "${1} is required, but you don't seem to have it. Aborting because this script won't work without ${1}."
   fi
-  step "${1} is required, and it looks like you have it installed. Proceeding..."
+  echo "${1} is required and present. Proceeding..."
 }
 
 gather () {
@@ -106,8 +107,10 @@ ensure_project_slug () {
       for instance valid project slug would look like\
       'gh/CircleCI-Public/circleci-cli'.")
   fi
-  echo ${BASH_SOURCE[0]}
   step "Your project_slug is set to ${project_slug}. You can change this in the file $( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+  vcs_slug=$(awk -F/ '{print $1}' <<< $project_slug)
+  org_name=$(awk -F/ '{print $2}' <<< $project_slug)
+  project_name=$(awk -F/ '{print $3}' <<< $project_slug)
 }
 
 post () {
@@ -135,8 +138,9 @@ require_command git
 require_command circleci
 require_command yq
 require_command jq
-ensure_project_slug
+require_command awk
 section 'SETUP SOME VARIABLES'
+ensure_project_slug
 set_token
 section 'TRY TRIGGERING AND RETRIEVING A PIPELINE'
 step "Attemping to trigger a pipeline on the project ${project_slug}"
@@ -148,3 +152,8 @@ get_path="pipeline/${pipeline_id}"
 result=$(get $get_path)
 step "GET pipeline by ID: /${get_path} - the raw payload is below"
 echo $result
+echo ""
+step "You should now be able to see the workflow(s) for this pipeline here:"
+workflow_url_for_project="${circleci_root}${vcs_slug}/${org_name}/workflows/${project_name}"
+echo $workflow_url_for_project
+

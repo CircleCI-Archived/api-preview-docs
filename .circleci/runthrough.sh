@@ -4,7 +4,8 @@
 # VARIABLES
 # *******************
 path_to_cli_config='~/.circleci/cli.yml'
-api_root='https://circleci.com/api/v2/'
+circleci_root='https://circleci.com/'
+api_root="${circleci_root}api/v2/"
 cli_config_path="${HOME}/.circleci/cli.yml"
 project_slug="gh/ndintenfass/scratch"
 parameter_map='{"workingdir": "~/myspecialdir", "image-tag": "4.8.2"}'
@@ -100,15 +101,22 @@ ensure_project_slug () {
       for instance valid project slug would look like\
       'gh/CircleCI-Public/circleci-cli'.")
   fi
-  step "Your project_slug is set to ${project_slug}"
+  echo ${BASH_SOURCE[0]}
+  step "Your project_slug is set to ${project_slug}. You can change this in the file $( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 }
 
 post () {
   local url="${api_root}${1}"
-  # curl -v -u ${circle_token}: -X POST --header "Content-Type: application/json" -d ''"${2}"'' "${url}"
   curl -su ${circle_token}: -X POST \
        --header "Content-Type: application/json" \
        -d "$2"\
+       "${url}"
+}
+
+get () {
+  local url="${api_root}${1}"
+  curl -su ${circle_token}: \
+       --header "Content-Type: application/json" \
        "${url}"
 }
 
@@ -121,13 +129,17 @@ section 'CHECK PREREQUISITES'
 require_command git
 require_command circleci
 require_command yq
+require_command jq
 ensure_project_slug
 section 'SETUP SOME VARIABLES'
 set_token
 section 'TRY TRIGGERING AND RETRIEVING A PIPELINE'
+step "Attemping to trigger a pipeline on the project ${project_slug}"
 params="{\"parameters\": ${parameter_map} }"
 result=$(post "project/${project_slug}/pipeline" "${params}")
-pipeline_id=$(echo $result | jq .id)
+pipeline_id=$(echo $result | jq -r .id)
 step "Successfully created pipeline with ID $pipeline_id"
-
-
+get_path="pipeline/${pipeline_id}"
+result=$(get $get_path)
+step "GET pipeline by ID: /${get_path} - the raw payload is below"
+echo $result

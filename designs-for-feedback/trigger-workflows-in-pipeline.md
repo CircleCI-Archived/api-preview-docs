@@ -62,11 +62,9 @@ unless it was invoked explicitly when the pipeline is triggered with:
 }
 ```
 
-The nested `condition` key is reused from job configuration as can be seen below
-for the `deploy` job, and actually accepts any boolean, not just pipeline
-parameters. It is needed to signify that this value is evaluated at
-configuration compilation time, as opposed to a possible future addition that
-could be evaluated at run time.
+The `when` key actually accepts any boolean, not just pipeline parameters,
+though pipeline parameters will be the only meaningful use of this feature until
+we implement others. 
 
 `when` would also come with an alternative of `unless`, which inverts truthiness
 of the condition.

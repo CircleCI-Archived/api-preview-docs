@@ -1,5 +1,11 @@
 #! /bin/bash
 
+
+# TODO: Does not check for pipeline errors
+# TODO: Does not know all possible status values for workflows
+# TODO: Only gets jobs for workflows still running when initially retrieved
+
+
 #********************
 # VARIABLES
 # *******************
@@ -16,30 +22,9 @@ api_root="${circleci_root}api/v2/"
 cli_config_path="${HOME}/.circleci/cli.yml"
 # branch="tryapi"
 
-
 #********************
 # FUNCTIONS
 # *******************
-
-roman() {
-    local values=( 1000 900 500 400 100 90 50 40 10 5 4 1 )
-    local roman=(
-        [1000]=M [900]=CM [500]=D [400]=CD 
-         [100]=C  [90]=XC  [50]=L  [40]=XL 
-          [10]=X   [9]=IX   [5]=V   [4]=IV 
-           [1]=I
-    )
-    local nvmber=""
-    local num=$1
-    for value in ${values[@]}; do
-        while (( num >= value )); do
-            nvmber+=${roman[value]}
-            ((num -= value))
-        done
-    done
-    echo $nvmber
-}
-
 
 current_section=0
 current_step=0
@@ -128,11 +113,38 @@ get () {
        "${url}"
 }
 
+pretty_json () {
+  # jq . <<< "${result}" | sed 's/^/  /'
+  echo "\`\`\`"
+  jq . <<< "${result}"
+  echo "\`\`\`"
+}
+
+roman() {
+    local values=( 1000 900 500 400 100 90 50 40 10 5 4 1 )
+    local roman=(
+        [1000]=M [900]=CM [500]=D [400]=CD 
+         [100]=C  [90]=XC  [50]=L  [40]=XL 
+          [10]=X   [9]=IX   [5]=V   [4]=IV 
+           [1]=I
+    )
+    local nvmber=""
+    local num=$1
+    for value in ${values[@]}; do
+        while (( num >= value )); do
+            nvmber+=${roman[value]}
+            ((num -= value))
+        done
+    done
+    echo $nvmber
+}
+
 #********************
 # PREAMBLE AND SETUP
 # *******************
 section 'INTRO: A QUICK RUN THROUGH OF THE v2 API'
 step 'Hello, this script runs through some really simple cases enabled by the CircleCI v2 API's
+
 section 'CHECK PREREQUISITES'
 require_command git
 require_command circleci
@@ -142,18 +154,87 @@ require_command awk
 section 'SETUP SOME VARIABLES'
 ensure_project_slug
 set_token
+
+#********************
+# TRIGGER AND RETRIEVE PIPELINE
+# *******************
 section 'TRY TRIGGERING AND RETRIEVING A PIPELINE'
-step "Attemping to trigger a pipeline on the project ${project_slug}"
+post_path="project/${project_slug}/pipeline"
+step "Attemping to trigger a pipeline with a POST to ${post_path}"
 params="{\"parameters\": ${parameter_map} }"
-result=$(post "project/${project_slug}/pipeline" "${params}")
+result=$(post $post_path "${params}")
+pretty_json $result
 pipeline_id=$(echo $result | jq -r .id)
 step "Successfully created pipeline with ID $pipeline_id"
 get_path="pipeline/${pipeline_id}"
-result=$(get $get_path)
 step "GET pipeline by ID: /${get_path} - the raw payload is below"
-echo $result
-echo ""
-step "You should now be able to see the workflow(s) for this pipeline here:"
+result=$(get $get_path)
+pretty_json $result
+
+#********************
+# GET WORKFLOWS
+# *******************
+section 'GET THE WORKFLOWS FOR THE ABOVE PIPELINE'
+
+# jq -r .workflows.ids[] <<<$result
+
+workflow_count=$(echo $result | jq -r .workflows.total_count)
+step "You should now be able to see the ${workflow_count} workflow(s) for this pipeline here:"
 workflow_url_for_project="${circleci_root}${vcs_slug}/${org_name}/workflows/${project_name}"
 echo $workflow_url_for_project
+echo ""
+workflow_ids=($(echo $result | jq -r '.workflows.ids[] | @sh'))
+#DUMB HACK TO STRIP SINGLE QUOTES THAT CAN LIKELY BE SOLVED MORE ELEGANTLY
+workflow_ids=(${workflow_ids[@]//\'/})
+step "Now let's loop over the ${workflow_count} workflow(s) and get info about each one"
+declare -a running_workflows
+for id in ${workflow_ids[@]}; do
+  get_path="workflow/${id}"
+  step "GET workflow by ID: /${get_path} - the raw payload is below"
+  result=$(get $get_path)
+  pretty_json $result
+  status=$(echo $result | jq -r '.status')
+  if [[ $status == "running" ]]; then
+    echo "Still running, so add it to the list of workflows to poll down below..."
+    running_workflows+=($id)
+  else
+    echo "Finished running with status: ${status}"
+  fi
+done
+step "There's ${#running_workflows[@]} workflow(s) running. Below we loop through them, polling each one for a while to see if it will finish"
 
+for i in "${!running_workflows[@]}"; do
+  id=${running_workflows[i]}
+  still_running=true
+  maxloops=25
+  loops=0
+  wait="1s"
+
+  get_path="workflow/${id}"
+  step "Poll every ${wait} to GET workflow /${get_path}"
+  echo "NOTE: If you prefer to see it in the UI visit:"
+  echo "${circleci_root}workflow-run/${id}"
+  printf "polling, please wait..."
+  while [ $still_running ]; do
+    result=$(get $get_path)
+    status=$(echo $result | jq -r '.status')
+    if [[ $status != "running" ]]; then
+      still_running=false
+      printf "Finished with status of ${status}!\n"
+      echo "Now retrieve info on the jobs of this workflow"
+      get_path="workflow/${id}/jobs"
+      echo "GET workflow jobs: /${get_path}"
+      result=$(get $get_path)
+      pretty_json $result
+      break
+    else
+      printf "."
+      let loops++
+      sleep $wait
+    fi
+    if [[ $loops == $maxloops ]]; then
+      echo "Max loops of ${maxloops} has been reached, so stopping querying for this workflow."
+      break
+    fi
+  done
+done

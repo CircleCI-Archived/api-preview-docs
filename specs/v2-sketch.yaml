@@ -439,6 +439,7 @@ components:
         - created_at
         - idempotency_key
         - errors
+        - workflows
       properties:
         id:
           type: string
@@ -513,6 +514,18 @@ components:
               type:
                 type: string
                 enum: ["config", "plan"]
+        workflows:
+          description: |
+            List of Workflow IDs for all Workflows of this Pipeline. (NOTE: This
+            is limited to 50 items.)
+          type: object
+          properties:
+            total_count:
+              type: integer
+            ids:
+              type: array
+              items:
+                type: string
         state:
           type: string
           enum: ["pending", "created", "blocked", "on_hold",

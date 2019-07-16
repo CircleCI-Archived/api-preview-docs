@@ -37,7 +37,7 @@ Retrieve an individual project by its unique slug.
 ### POST /project/:project_slug/pipeline
 Trigger a new pipeline run on a project.
 
-To trigger with parameters you pass a `parameters` map inside a JSON object as part of the POST body. For details on passing pipeline parameters when triggering pipelines with the API see the [pipeline parameters documentation](pipeline-parameters.md).
+To trigger with parameters you pass a `parameters` map inside a JSON object as part of the POST body. For details on passing pipeline parameters when triggering pipelines with the API see the [pipeline parameters documentation](pipeline-parameters.md). Note that pipeline parameters can also be used to populate a `when` or `unless` clause on a workflow to conditionally run one or more workflows. See the [conditional workflows](conditional-workflows.md) doc for more information.
 
 ### GET /pipeline/:id
 Retrieve a particular pipeline by its unique ID. This will return basic information about the pipeline, including triggering information and the IDs of running workflows associated with the pipeline. Please note that workflows are created asyncronously to the creation of a pipeline, so in automated scripts if you trigger a pipeline it may not immediately have knowledge of all workflows that will be run as a result of your trigger. You may need to make subsequent, delayed requests to get all workflow IDs. In most cases this should be a matter of a few seconds, but in some situations the queues between our pipeline ingestion machinery and our workflows conductor can take longer to proceed.

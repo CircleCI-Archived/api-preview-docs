@@ -1,4 +1,12 @@
-# Request for Comment: Trigger an individual workflow
+
+# NOTE: THIS DESIGN DOCUMENT IS NOW OBSOLETE.
+PLEASE SEE [THE DOC ON CONDITIONAL WORKFLOWS](../docs/conditional-workflows.md) FOR INFO ON THE ACCEPTED IMPLEMENTATION.
+
+
+
+
+
+
 ## Problem statement
 Users want to be able to trigger a pipeline, selecting a specific workflow in
 the configuration to run. They also need a way for such manually triggered
@@ -46,7 +54,7 @@ workflows:
           condition: << pipeline.parameters.deploy >>
           steps:
             - deploy
-            
+
 jobs:
   ...
 ```

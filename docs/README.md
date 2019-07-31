@@ -39,4 +39,8 @@ curl -u ${CIRCLECI_TOKEN}: -X POST --header "Content-Type: application/json" -d 
 In the above example the `project_slug` would take the form `:vcs/:org/:project`. For instance the project slug `gh/CircleCI-Public/circleci-cli` tells CircleCI to use the project found in the GitHub organization `CircleCI-Public` in the repository named `circleci-cli`.
 
 # Where next?
-Dive in by reviewing [the new endpoints in API v2](api-changes.md).
+
+We publish the the current OpenAPI spec as
+[JSON](https://circleci.com/api/v2/openapi.json) and
+[YAML](https://circleci.com/api/v2/openapi.yml) as part of the API.
+

@@ -39,18 +39,30 @@ Trigger a new pipeline run on a project.
 
 To trigger with parameters you pass a `parameters` map inside a JSON object as part of the POST body. For details on passing pipeline parameters when triggering pipelines with the API see the [pipeline parameters documentation](pipeline-parameters.md). Note that pipeline parameters can also be used to populate a `when` or `unless` clause on a workflow to conditionally run one or more workflows. See the [conditional workflows](conditional-workflows.md) doc for more information.
 
+To trigger on a specific branch pass a parameter `branch` in the post body. For instance, it might look like:
+
+```
+curl -u ${CIRCLECI_TOKEN}: -X POST --header "Content-Type: application/json" -d '{
+  "branch": "dev"
+}' https://circleci.com/api/v2/project/${project_slug}/pipeline
+```
+
+
+### GET /project/:project_slug/pipeline/
+Retrieve recent set of pipelines for a project.
+
 ### GET /pipeline/:id
 Retrieve a particular pipeline by its unique ID. This will return basic information about the pipeline, including triggering information and the IDs of running workflows associated with the pipeline. Please note that workflows are created asyncronously to the creation of a pipeline, so in automated scripts if you trigger a pipeline it may not immediately have knowledge of all workflows that will be run as a result of your trigger. You may need to make subsequent, delayed requests to get all workflow IDs. In most cases this should be a matter of a few seconds, but in some situations the queues between our pipeline ingestion machinery and our workflows conductor can take longer to proceed.
 
 ### GET /pipeline/:id/config
 Retrieve the configuration (both the source and compiled versions) for a given pipeline.
 
-## COMING SOON 
-### Run only a specific workflow in a triggered pipeline
-The `POST /project/:project_slug/pipeline` will have the ability to run only a specified workflow. [See the design document to provide feedback on how this will work](../designs-for-feedback/trigger-workflows-in-pipeline.md).
+### Run only workflows conditioned on API parameters
+Use the new `when` clause under a workflow, you can use the value of a boolean pipeline parameter to conditionally start specific workflows. See the documentation on [conditional workflows](conditional-workflows.md) for more.
 
-### GET /project/:project_slug/pipelines/[:filter]
-Retrieve recent set of pipelines for a project. The shape of the filter will be documented once this endpoint is ready to be previewed. Filters may be used to retrieve pipelines for a given branch, for instance. _PREVIEW NOTE: We may change this to be more a more generic method for retrieving piplines by project, by organization, or by triggerer. If we stick with a project-oriented endpoint like this one we may not ship filters in the initial release, but we want to hear about your use cases for filtering._
+### GET openapi.json or GET openapi.yml
+Gives you the current production OpenAPI spec for the v2 API (eg: <https://circleci.com/api/v2/openapi.json> )
+
 
 ## Endpoints likely being removed in API v2 (still available in v1.1 for now)
 ### POST    /project/:vcs-type/:username/:project

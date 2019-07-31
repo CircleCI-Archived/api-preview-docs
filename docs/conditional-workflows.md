@@ -1,5 +1,5 @@
 # Conditional Workflows
-New as of June 2019, you can use a `when` clause (and coming soon, also support for the inverse clause `unless`) under a workflow declaration with a boolean value to decide whether or not to run that workflow.
+New as of June 2019, you can use a `when` clause (we also support the inverse clause `unless`) under a workflow declaration with a boolean value to decide whether or not to run that workflow.
 
 The most common use of this construct is to use a [pipeline parameter](pipeline-parameters.md) as the value, allowing an API trigger to pass that parameter to determine which workflows to run.
 
@@ -43,6 +43,4 @@ unless it was invoked explicitly when the pipeline is triggered with the followi
 ```
 
 The `when` key actually accepts any boolean, not just pipeline parameters,
-though pipeline parameters will be the primary use of this feature until we implement others.
-
-Coming soon: `when` also comes with an alternative of `unless`, which inverts truthiness of the condition.
+though pipeline parameters will be the primary use of this feature until we implement others. `when` also has an inverse clause called `unless`, which inverts truthiness of the condition.

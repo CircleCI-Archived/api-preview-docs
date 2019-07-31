@@ -10,12 +10,15 @@
 # VARIABLES
 # *******************
 
-# CHANGE THESE TO REFLECT YOUR PROJECT
-# AND THE PARAMETERS YOU WANT TO SEND
+# **** !!!!
+# **** CHANGE THESE TO REFLECT YOUR PROJECT
+# **** AND THE PARAMETERS YOU WANT TO SEND
+# **** !!!!
 project_slug="gh/ndintenfass/scratch"
 parameter_map='{"workingdir": "~/myspecialdir", "image-tag": "4.8.2"}'
 
-# YOU LIKELY DO NOT NEED TO EDIT THESE
+
+# YOU LIKELY DO NOT NEED TO EDIT THESE OR ANYTHING BELOW HERE
 path_to_cli_config='~/.circleci/cli.yml'
 circleci_root='https://circleci.com/'
 api_root="${circleci_root}api/v2/"
@@ -238,3 +241,14 @@ for i in "${!running_workflows[@]}"; do
     fi
   done
 done
+
+#********************
+# GET RECENT PIPELINES FOR THE PROJECT
+# *******************
+section 'GET RECENT PIPELINES'
+get_path="project/${project_slug}/pipeline"
+step "GET recent pipelines for project ${project_slug}  - The latest two from .items are below"
+result=$(get $get_path)
+echo $result | jq .items[0:2]
+
+

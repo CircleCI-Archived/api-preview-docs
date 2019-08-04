@@ -8,6 +8,19 @@ version: 2.1
 
 orbs:
   tools: circleci/node@volatile
+  spectacle:
+    executors:
+      default:
+        docker:
+          - image: sourcey/spectacle
+    commands:
+      build-docs:
+        parameters:
+          file:
+            type: string
+            description: "local path to the openAPI json"
+        steps:
+          - spectacle -d << parameters.file >>
 
 jobs:
   validate:
@@ -17,6 +30,12 @@ jobs:
       - checkout
       - run: swagger-cli validate "<< pipeline.parameters.spec-root >>v2-sketch.yaml"
 
+  generate-docs:
+    executor: spectacle/default
+    steps:
+      - run: curl -o circleci-openapi.json https://circleci.com/api/v2/openapi.json
+      - build-docs:
+          file: circleci-openapi.json
 workflows:
   main:
     jobs:

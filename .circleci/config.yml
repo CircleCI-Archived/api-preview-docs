@@ -19,9 +19,19 @@ orbs:
           file:
             type: string
             description: "local path to the openAPI json"
+          save-artifact:
+            type: boolean
+            default: true
+          publish-dir:
+            type: string
+            default: "~/spectacle/"
         steps:
-          - run: spectacle << parameters.file >>
-
+          - run: spectacle -t <<parameters.publish-dir >> << parameters.file >>
+          - when:
+              condition: << parameters.save-artifact >>
+              steps:
+                store_artifacts:
+                  path: << parameters.publish-dir >>
 jobs:
   validate:
     executor: tools/default

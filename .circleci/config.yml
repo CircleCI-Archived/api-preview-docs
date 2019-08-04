@@ -43,8 +43,8 @@ jobs:
   generate-docs:
     executor: spectacle/default
     steps:
-      - run: curl -o circleci-openapi.json https://circleci.com/api/v2/openapi.json
       - checkout
+      - run: curl -o circleci-openapi.json https://circleci.com/api/v2/openapi.json
       - spectacle/build-docs:
           file: circleci-openapi.json
 workflows:

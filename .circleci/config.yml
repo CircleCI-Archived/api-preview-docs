@@ -20,7 +20,7 @@ orbs:
             type: string
             description: "local path to the openAPI json"
         steps:
-          - run: spectacle -d << parameters.file >>
+          - run: spectacle << parameters.file >>
 
 jobs:
   validate:

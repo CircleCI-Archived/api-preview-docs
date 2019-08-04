@@ -20,7 +20,7 @@ orbs:
             type: string
             description: "local path to the openAPI json"
         steps:
-          - spectacle -d << parameters.file >>
+          - run: spectacle -d << parameters.file >>
 
 jobs:
   validate:
@@ -34,9 +34,11 @@ jobs:
     executor: spectacle/default
     steps:
       - run: curl -o circleci-openapi.json https://circleci.com/api/v2/openapi.json
-      - build-docs:
+      - spectacle/build-docs:
           file: circleci-openapi.json
 workflows:
   main:
     jobs:
       - validate
+      - generate-docs
+

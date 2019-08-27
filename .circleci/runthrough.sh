@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
-set -u
 set -o pipefail
+set -o functrace
 
 # TODO: Not tolerant of initial trigger failing to create any workflows in time - should have some retry logic.
 # TODO: Does not check for pipeline errors
@@ -26,6 +26,7 @@ path_to_cli_config='~/.circleci/cli.yml'
 circleci_root='https://circleci.com/'
 api_root="${circleci_root}api/v2/"
 cli_config_path="${HOME}/.circleci/cli.yml"
+
 # branch="tryapi"
 
 #********************
@@ -104,8 +105,12 @@ ensure_project_slug () {
   project_name=$(awk -F/ '{print $3}' <<< $project_slug)
 }
 
+
+
 post () {
   local url="${api_root}${1}"
+  printf "HTTP POST ${url}\n\n" > /dev/tty
+
   curl -su ${circle_token}: -X POST \
        --header "Content-Type: application/json" \
        -d "$2"\
@@ -114,6 +119,7 @@ post () {
 
 get () {
   local url="${api_root}${1}"
+  printf "HTTP GET ${url}\n\n" > /dev/tty
   curl -su ${circle_token}: \
        --header "Content-Type: application/json" \
        "${url}"

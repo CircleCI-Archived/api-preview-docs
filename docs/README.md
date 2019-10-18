@@ -23,9 +23,9 @@ The CircleCI v2 API behaves very similarly to our v1.1 API. For instance, to get
 
 
 ## GETTING STARTED WITH CIRCLECI API v2
-The v2 API is very similar to our currently documented v1.1 API with some notable exceptions. For details on see the file [docs/api-changes.md](docs/api-changes.md) in this repository, originally at <https://github.com/CircleCI-Public/api-preview-docs>.
+The v2 API is very similar to our currently documented v1.1 API with some notable exceptions. For details on see the file [docs/api-changes.md](api-changes.md) in this repository, originally at <https://github.com/CircleCI-Public/api-preview-docs>.
 
-Here is a simple example using `curl` to trigger a pipeline with parameters (NOTE: see [docs/pipeline-parameters.md](docs/pipeline-parameters.md) in this repository for more on pipeline parameters, as they behave differently from parameters in the 1.1 job triggering endpoint):
+Here is a simple example using `curl` to trigger a pipeline with parameters (NOTE: see [docs/pipeline-parameters.md](pipeline-parameters.md) in this repository for more on pipeline parameters, as they behave differently from parameters in the 1.1 job triggering endpoint):
 
 ```
 curl -u ${CIRCLECI_TOKEN}: -X POST --header "Content-Type: application/json" -d '{

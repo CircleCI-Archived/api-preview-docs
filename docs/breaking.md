@@ -51,7 +51,7 @@ For user fault errors, the error message will be human readable and have enough 
 
 Generally responds with:
 
-``` json
+```
 {"message": "some-entity-name not found."}
 ```
 
@@ -61,7 +61,7 @@ For example, you will see this error code when a resource is not found, or if th
 
 Generally responds with:
 
-``` json
+```
 {
     "errors": [{"type":  "error-type",
                 "value": "some value"}...]
@@ -102,7 +102,7 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 #### Users
 
-``` json
+```
 {
    "id": "UUID",
    "name": "Circler"
@@ -111,7 +111,7 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 #### External Identity
 
-``` json
+```
 {
    "id": "external-id",
    "login": "login",
@@ -123,7 +123,7 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 #### Project (Short)
 
-``` json
+```
 {
    "slug": "gh/circleci/example-project",
    "name": "example-project",
@@ -133,7 +133,7 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 #### Project (Full)
 
-``` json
+```
 {
   "slug": "gh/circleci/example-project",
   "name": "example-project",
@@ -149,7 +149,7 @@ Note that the following keys will be removed from this response:
 
 #### Organization (Short)
 
-``` json
+```
 {
    "slug": "gh/circleci",
    "name": "circleci"
@@ -158,7 +158,7 @@ Note that the following keys will be removed from this response:
 
 #### Job (Short)
 
-``` json
+```
 {
    "id": "uuid",
    "name": "deploy-service",
@@ -188,7 +188,7 @@ Note that the following keys will be removed from this response:
 
 #### Job (Full)
 
-``` json
+```
 {
    "id": "uuid",
    "name": "deploy-service",
@@ -222,17 +222,14 @@ Note that the following keys will be removed from this response:
    "parallelism": 1,
    "parallel_runs": [
       {
-         "index: 0
+         "index": 0,
          "status": "success"
       }
    ],
 
    "web_url": "https://circleci.com/gh/circleci/domain-service/5327",
- 
    "project": {...}, // Project Short
-
    "organization": {...}, // Organization Short
- 
    "messages": [
       {
          "type": "warning",
@@ -250,7 +247,7 @@ Note that the following keys will be removed from this response:
 
 #### Workflow (Short)
 
-``` json
+```
 {
   "id": "string",
   "name": "build-and-test",
@@ -263,7 +260,7 @@ Note that the following keys will be removed from this response:
 
 #### Workflow (Full)
 
-``` json
+```
 {
   "id": "string",
   "name": "build-and-test",
@@ -289,7 +286,7 @@ Note that the following keys will be removed from this response:
 
 #### Pipeline (Short)
 
-``` json
+```
 {
   "id": "string",
   "number": 1,
@@ -301,7 +298,7 @@ Note that the following keys will be removed from this response:
 
 #### Pipeline (Full)
 
-``` json
+```
 {
   "id": "string",
   "number": 0,
@@ -309,7 +306,7 @@ Note that the following keys will be removed from this response:
   "status": {
      "name": "dont_run",
      "details": {
-       "reason": ["ci-skip"|"branch-not-whitelisted"|..."]
+       "reason": ["ci-skip"|"branch-not-whitelisted"|"..."]
      }
   },
 
@@ -354,7 +351,7 @@ Note that the following keys will be removed from this response:
 
 #### Checkout Key (Full)
 
-``` json
+```
 {
   "public_key": "ssh-rsa ...",
   "type": "deploy-key",
@@ -370,7 +367,7 @@ Note that the following keys will be removed from this response:
 
 #### Environment Variable (Full)
 
-``` json
+```
 {
   "name": "foo",
   "value": "xxxx1234"
@@ -379,7 +376,7 @@ Note that the following keys will be removed from this response:
 
 #### Status (Full)
 
-``` json
+```
    "status": {
       "name": "canceled",
       // null or object
@@ -397,7 +394,7 @@ Note that the following keys will be removed from this response:
    "status": {
       "name": "dont_run",
       "details": {
-        "reason": ["ci-skip"|"branch-not-whitelisted"|..."]
+        "reason": ["ci-skip"|"branch-not-whitelisted"|"..."]
       }
 }
 ```

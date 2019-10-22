@@ -86,6 +86,10 @@ The relevant HTTP 5xx status codes will be used in the situation where a server 
 - References to `pipeline/` will be pluralized to `pipelineS/` e.g.
   - `/pipeline/{pipeline-id}` -> `pipelineS/{pipeline-id}`
   - `/pipeline/{pipeline-id}/config` -> `/pipelineS/{pipeline-id}/config`
+- References to `job/` will be pluralized to `jobS/` e.g.
+  - `/project/{project-slug}/job/{job-number}` -> `/project/{project-slug}/jobS/{job-number}`
+- References to `workflow/` will be pluralized to `workflowS/` e.g.
+  - `/workflow/{id}` -> `/workflowS/{id}`
 
 ### Paginated Responses
 

@@ -23,9 +23,13 @@ The changes we are making fall into one of five general categories:
 
 ### Removed endpoints
 
-The list of removed endpoints have already been announced in the original API v2 preview announcement. You can find the list of endpoints that didn't make the transition from `v1.1` to `v2` [here](https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/api-changes.md#endpoints-likely-being-removed-in-api-v2-still-available-in-v11-for-now).
+The list of removed endpoints have already been announced in the original API v2 preview announcement. You can find the list of endpoints that didn't make the transition from v1.1 to v2 [here](https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/api-changes.md#endpoints-likely-being-removed-in-api-v2-still-available-in-v11-for-now).
 
-There are no other endpoints marked for removal to share at this time.
+In addition to that list, the following endpoint has been removed:
+
+#### Add User to Build
+
+`POST project/:vcs-type/:username/:project/:build_num/ssh-users?circle-token=:token` has been removed because this operation is no longer supported on the CircleCI 2.0 platform.
 
 ### Consistent HTTP Responses
 
@@ -55,7 +59,7 @@ For example, you will see this error code when a resource is not found, or if th
 
 ###### 400 Bad Request
 
-Generally responds with: 
+Generally responds with:
 
 ``` json
 {

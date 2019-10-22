@@ -39,7 +39,7 @@ We've caught a few situations where some API endpoints don't respond with the ex
 
 200 OK - responds with a custom payload
 201 Created - responds with the created entity
-202 Accepted -  responds with `{“message”: “Accepted.”}`
+202 Accepted -  responds with `{"message": "Accepted."}`
 
 #### Error Status Codes
 
@@ -52,7 +52,7 @@ For user fault errors, the error message will be human readable and have enough 
 Generally responds with:
 
 ``` json
-{“message”: “some-entity-name not found.”}
+{"message": "some-entity-name not found."}
 ```
 
 For example, you will see this error code when a resource is not found, or if the URI doesn't exist or is malformed.
@@ -63,8 +63,8 @@ Generally responds with:
 
 ``` json
 {
-    “errors”: [{“type”:  “error-type”,
-                “value”: “some value”}...]
+    "errors": [{"type":  "error-type",
+                "value": "some value"}...]
 }
 ```
 
@@ -74,8 +74,8 @@ For example, you will typically see this error code when query parameters are mi
 
 The relevant HTTP 5xx status codes will be used in the situation where a server error occurs. The return body will contain a message explaining the error. For example:
 
-- 500 Internal Server Error - responds with `{“message”: “Internal server error.”}`
-- 503 Service Unavailable - responds with `{“message”: “Service unavailable.”}`
+- 500 Internal Server Error - responds with `{"message": "Internal server error."}`
+- 503 Service Unavailable - responds with `{"message": "Service unavailable."}`
 
 ### Changes to Routes
 
@@ -104,8 +104,8 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 ``` json
 {
-   “id”: "UUID",
-   “name”: “Circler"
+   "id": "UUID",
+   "name": "Circler"
 }
 ```
 
@@ -113,11 +113,11 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 ``` json
 {
-   “id”: “external-id”,
-   “login”: “login”,
-   “avatar_url”: "https://example.com",
-   “name”: "Circler",
-   “web_url”: "https://github.com/circler"
+   "id": "external-id",
+   "login": "login",
+   "avatar_url": "https://example.com",
+   "name": "Circler",
+   "web_url": "https://github.com/circler"
 }
 ```
 
@@ -125,9 +125,9 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 ``` json
 {
-   “slug”: "gh/circleci/example-project",
-   “name”: “example-project”,
-   “external_url”: “https://github.com/circleci/example-project”
+   "slug": "gh/circleci/example-project",
+   "name": "example-project",
+   "external_url": "https://github.com/circleci/example-project"
 }
 ```
 
@@ -135,10 +135,10 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 ``` json
 {
-  “slug”: "gh/circleci/example-project",
-  “name”: “example-project”,
-  “external_url”: “https://github.com/circleci/example-project”,
-  “organization”: {...} // Organization Short
+  "slug": "gh/circleci/example-project",
+  "name": "example-project",
+  "external_url": "https://github.com/circleci/example-project",
+  "organization": {...} // Organization Short
 }
 ```
 
@@ -151,8 +151,8 @@ Note that the following keys will be removed from this response:
 
 ``` json
 {
-   “slug”: “gh/circleci”,
-   “name”: “circleci”
+   "slug": "gh/circleci",
+   "name": "circleci"
 }
 ```
 
@@ -160,24 +160,24 @@ Note that the following keys will be removed from this response:
 
 ``` json
 {
-   “id”: “uuid”,
-   “name”: "deploy-service",
-   “number”: 5327,
-   “type”: “build”
+   "id": "uuid",
+   "name": "deploy-service",
+   "number": 5327,
+   "type": "build"
 
-   “status”: {
-      “name”: "canceled",
+   "status": {
+      "name": "canceled",
       // null or object
-      “details”: {
-         “canceler”: {
-             “user”: {...}, // User Short
-             “external_identity”: {...} // External Identity Full
+      "details": {
+         "canceler": {
+             "user": {...}, // User Short
+             "external_identity": {...} // External Identity Full
    },
 
-   “started_at”: "2019-09-05T19:13:30.236Z",
-   “stopped_at”: "2019-09-05T19:13:49.909Z",
+   "started_at": "2019-09-05T19:13:30.236Z",
+   "stopped_at": "2019-09-05T19:13:49.909Z",
 
-   “project”: {...}, // Project Short
+   "project": {...}, // Project Short
 }
 ```
 
@@ -190,60 +190,60 @@ Note that the following keys will be removed from this response:
 
 ``` json
 {
-   “id”: “uuid”,
-   “name”: "deploy-service",
-   “number”: 5327,
-   “type”: “build”,
+   "id": "uuid",
+   "name": "deploy-service",
+   "number": 5327,
+   "type": "build",
 
-   “status”: {
-      “name”: "canceled",
+   "status": {
+      "name": "canceled",
       // null or object
-      “details”: {
-         “canceler”: {
-             “user”: {...}, // User Short
-             “external_identity”: {...} // External Identity Full
+      "details": {
+         "canceler": {
+             "user": {...}, // User Short
+             "external_identity": {...} // External Identity Full
    },
  
-   “contexts”: [
-      {“name”: "org-global"}
+   "contexts": [
+      {"name": "org-global"}
    ],
  
-   “latest_workflow”: {...}, // Workflow Short
+   "latest_workflow": {...}, // Workflow Short
 
-   “pipeline”: {...}, // Pipeline Short
+   "pipeline": {...}, // Pipeline Short
 
 
-   “created_at”: "2019-09-05T19:13:28.049Z",
-   “queued_at”: "2019-09-05T19:13:28.107Z",
-   “started_at”: "2019-09-05T19:13:30.236Z",
-   “stopped_at”: "2019-09-05T19:13:49.909Z",
-   “duration”: 19673,
+   "created_at": "2019-09-05T19:13:28.049Z",
+   "queued_at": "2019-09-05T19:13:28.107Z",
+   "started_at": "2019-09-05T19:13:30.236Z",
+   "stopped_at": "2019-09-05T19:13:49.909Z",
+   "duration": 19673,
  
-   “parallelism”: 1,
-   “parallel_runs”: [
+   "parallelism": 1,
+   "parallel_runs": [
       {
-         “index: 0
-         “status”: "success"
+         "index: 0
+         "status": "success"
       }
    ],
 
-   “web_url”: "https://circleci.com/gh/circleci/domain-service/5327",
+   "web_url": "https://circleci.com/gh/circleci/domain-service/5327",
  
-   “project”: {...}, // Project Short
+   "project": {...}, // Project Short
 
-   “organization”: {...}, // Organization Short
+   "organization": {...}, // Organization Short
  
-   “messages”: [
+   "messages": [
       {
-         “type”: "warning",
-         “message”: "'xxx' is not configured as a white-listed branch.",
-         “reason”: "branch-not-whitelisted"
+         "type": "warning",
+         "message": "'xxx' is not configured as a white-listed branch.",
+         "reason": "branch-not-whitelisted"
       }
    ],
 
-   “executor”: {
-      “type”: "docker",
-      “resource_class”: "medium"
+   "executor": {
+      "type": "docker",
+      "resource_class": "medium"
    }
 }
 ```
@@ -255,8 +255,8 @@ Note that the following keys will be removed from this response:
   "id": "string",
   "name": "build-and-test",
   "status": {
-     “name”: "success",
-     “details”: null // see Job Full
+     "name": "success",
+     "details": null // see Job Full
   },
 }
 ```
@@ -269,8 +269,8 @@ Note that the following keys will be removed from this response:
   "name": "build-and-test",
 
   "status": {
-     “name”: "success",
-     “details”: null // see Job Full
+     "name": "success",
+     "details": null // see Job Full
   },
 
   "created_at": "2019-10-04T22:04:35Z",
@@ -293,9 +293,9 @@ Note that the following keys will be removed from this response:
 {
   "id": "string",
   "number": 1,
-  “status”: {...},
-  “created_at”: “2019-10-07T14:07:33Z”,
-  “project”: {...} // Project Short
+  "status": {...},
+  "created_at": "2019-10-07T14:07:33Z",
+  "project": {...} // Project Short
 }
 ```
 
@@ -307,9 +307,9 @@ Note that the following keys will be removed from this response:
   "number": 0,
 
   "status": {
-     “name”: "dont_run",
-     “details”: {
-       “reason”: [“ci-skip”|”branch-not-whitelisted”|...”]
+     "name": "dont_run",
+     "details": {
+       "reason": ["ci-skip"|"branch-not-whitelisted"|..."]
      }
   },
 
@@ -328,16 +328,16 @@ Note that the following keys will be removed from this response:
 
   "created_at": "2019-10-04T22:04:35Z",
 
-  "trigger”: {
-    "branch”: “master”,
-    "tag”: “v3.1.4159”,
-    "revision”: “sha”,
-    “parameters”: {
-      “name”: “value”
+  "trigger": {
+    "branch": "master",
+    "tag": "v3.1.4159",
+    "revision": "sha",
+    "parameters": {
+      "name": "value"
     }
-    "by”: {
-      "user”: {...}, // User Short
-      "external_identity”: {...} // External Identity Full
+    "by": {
+      "user": {...}, // User Short
+      "external_identity": {...} // External Identity Full
     }
   }
 ```
@@ -360,7 +360,7 @@ Note that the following keys will be removed from this response:
   "type": "deploy-key",
   "fingerprint": "c9:0b:1c:4f:d5:65:56:b9:ad:88:f9:81:2b:37:74:2f",
   "preferred": true,
-  “created_at”: "2015-09-21T17:29:21.042Z"
+  "created_at": "2015-09-21T17:29:21.042Z"
 }
 ```
 
@@ -380,24 +380,24 @@ Note that the following keys will be removed from this response:
 #### Status (Full)
 
 ``` json
-   “status”: {
-      “name”: "canceled",
+   "status": {
+      "name": "canceled",
       // null or object
-      “details”: {
-         “canceler”: {
-             “user”: {...}, // User Short
-             “external_identity”: {...} // External Identity Full
+      "details": {
+         "canceler": {
+             "user": {...}, // User Short
+             "external_identity": {...} // External Identity Full
    },
 
    "status": {
-      “name”: "success",
-      “details”: null
+      "name": "success",
+      "details": null
    },
 
    "status": {
-      “name”: "dont_run",
-      “details”: {
-        “reason”: [“ci-skip”|”branch-not-whitelisted”|...”]
+      "name": "dont_run",
+      "details": {
+        "reason": ["ci-skip"|"branch-not-whitelisted"|..."]
       }
 }
 ```

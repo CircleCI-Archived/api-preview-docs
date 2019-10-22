@@ -47,31 +47,24 @@ For user fault errors, the error message will be human readable and have enough 
 
 Generally responds with:
 
-```json
+``` json
 {“message”: “some-entity-name not found.”}
 ```
 
-This code will be used when:
-
-- The requested resource is not found
-- The URI is incorrect, including project slug being incorrect, or job number/workflow ID being malformed. This does not include query parameters, which we can parse and validate.
-- Unauthenticated requests to resource
+For example, you will see this error code when a resource is not found, or if the URI doesn't exist or is malformed.
 
 ###### 400 Bad Request
 
 Generally responds with: 
 
-```json
+``` json
 {
     “errors”: [{“type”:  “error-type”,
                 “value”: “some value”}...]
 }
 ```
 
-Use this error code when:
-
-- Query parameters are missing or invalid
-- Request body is invalid
+For example, you will typically see this error code when query parameters are missing or invalid, or if the request body is invalid.
 
 #### Server Fault Codes
 
@@ -93,7 +86,7 @@ The relevant HTTP 5xx status codes will be used in the situation where a server 
 ### Paginated Responses
 
 - [Get an environment variable](https://circleci.com/docs/api/v2/#get-an-environment-variable) response will be paginated
-- [Get all checkout keys](https://circleci.com/docs/api/v2/#get-all-checkout-keys) response will be paginate
+- [Get all checkout keys](https://circleci.com/docs/api/v2/#get-all-checkout-keys) response will be paginated
 
 ### Representation of Objects in Responses
 
@@ -101,18 +94,16 @@ We're also proposing a change the shape of how objects will be represented in ou
 
 #### Users
 
-```json
+``` json
 {
    “id”: "UUID",
    “name”: “Circler"
 }
 ```
 
-Where `name` is taken from the User's associated VCS username. If the VCS provider does not supply a username, `name` will fallback on the VCS provider login.
-
 #### External Identity
 
-```json
+``` json
 {
    “id”: “external-id”,
    “login”: “login”,
@@ -124,7 +115,7 @@ Where `name` is taken from the User's associated VCS username. If the VCS provid
 
 #### Project (Short)
 
-```json
+``` json
 {
    “slug”: "gh/circleci/example-project",
    “name”: “example-project”,
@@ -134,7 +125,7 @@ Where `name` is taken from the User's associated VCS username. If the VCS provid
 
 #### Project (Full)
 
-```json
+``` json
 {
   “slug”: "gh/circleci/example-project",
   “name”: “example-project”,
@@ -150,7 +141,7 @@ Note that the following keys will be removed from this response:
 
 #### Organization (Short)
 
-```json
+``` json
 {
    “slug”: “gh/circleci”,
    “name”: “circleci”
@@ -159,7 +150,7 @@ Note that the following keys will be removed from this response:
 
 #### Job (Short)
 
-```json
+``` json
 {
    “id”: “uuid”,
    “name”: "deploy-service",
@@ -189,7 +180,7 @@ Note that the following keys will be removed from this response:
 
 #### Job (Full)
 
-```json
+``` json
 {
    “id”: “uuid”,
    “name”: "deploy-service",
@@ -251,7 +242,7 @@ Note that the following keys will be removed from this response:
 
 #### Workflow (Short)
 
-```json
+``` json
 {
   "id": "string",
   "name": "build-and-test",
@@ -264,7 +255,7 @@ Note that the following keys will be removed from this response:
 
 #### Workflow (Full)
 
-```json
+``` json
 {
   "id": "string",
   "name": "build-and-test",
@@ -290,7 +281,7 @@ Note that the following keys will be removed from this response:
 
 #### Pipeline (Short)
 
-```json
+``` json
 {
   "id": "string",
   "number": 1,
@@ -302,7 +293,7 @@ Note that the following keys will be removed from this response:
 
 #### Pipeline (Full)
 
-```json
+``` json
 {
   "id": "string",
   "number": 0,
@@ -355,7 +346,7 @@ Note that the following keys will be removed from this response:
 
 #### Checkout Key (Full)
 
-```json
+``` json
 {
   "public_key": "ssh-rsa ...",
   "type": "deploy-key",
@@ -371,7 +362,7 @@ Note that the following keys will be removed from this response:
 
 #### Environment Variable (Full)
 
-```json
+``` json
 {
   "name": "foo",
   "value": "xxxx1234"
@@ -380,7 +371,7 @@ Note that the following keys will be removed from this response:
 
 #### Status (Full)
 
-```json
+``` json
    “status”: {
       “name”: "canceled",
       // null or object

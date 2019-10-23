@@ -7,7 +7,7 @@
 
 # Proposed Breaking Changes
 
-## Oct 21, 2019
+## Oct 23, 2019
 
 The API v2 preview was made available earlier this year with the intent of exposing [new workflow and pipeline control endpoints](https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/api-changes.md#new-endpoints-available-for-preview-use) to our API users. With the v2 Preview endpoints in place, the team at CircleCI also began to migrate API v1 and v1.1 endpoints into v2.
 

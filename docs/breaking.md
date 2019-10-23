@@ -15,11 +15,11 @@ As we began to migrate endpoints into v2, the team took some time to re-evaluate
 
 The changes we are making fall into one of five general categories:
 
-- Removed endpoints
-- HTTP responses
-- Changes to routes
-- Paginated responses
-- Representation of objects in responses.
+- [Removed endpoints](#removed-endpoints)
+- [Consistent HTTP responses](#consistent-http-responses)
+- [Changes to routes](#changes-to-routes)
+- [Paginated responses](#paginated-responses)
+- [Representation of objects in responses](#representation-of-objects-in-responses)
 
 ### Removed endpoints
 
@@ -79,7 +79,7 @@ The relevant HTTP 5xx status codes will be used in the situation where a server 
 
 ### Changes to Routes
 
-- [Get Test Metadata](https://circleci.com/docs/api/v2/#get-test-metadata) endpoint will move from `/project/{project-slug}/{job-number}/tests` to `/project/{project-slug}/job/{job-number}/tests`. Note the addition of `job/` to the route
+- [Get Test Metadata](https://circleci.com/docs/api/v2/#get-test-metadata) endpoint will move from `/project/{project-slug}/{job-number}/tests` to `/project/{project-slug}/jobs/{job-number}/tests`. Note the addition of `jobs/` to the route
 - References to `project/` will be pluralized to `projectS/` e.g.
   - `/project/{project-slug}` -> `/projects/{project-slug}`
   - `/project/{project-slug}/job/{job-number}` -> `/projects/{project-slug}/job/{job-number}`
@@ -98,7 +98,7 @@ The relevant HTTP 5xx status codes will be used in the situation where a server 
 
 ### Representation of Objects in Responses
 
-We're also proposing a change the shape of how objects will be represented in our responses:
+We're also proposing a change to the shape of how objects will be represented in our responses:
 
 #### Users
 
@@ -160,7 +160,7 @@ Note that the following keys will be removed from this response:
 
 ```
 {
-   "id": "uuid",
+   "id": "UUID",
    "name": "deploy-service",
    "number": 5327,
    "type": "build"
@@ -190,7 +190,7 @@ Note that the following keys will be removed from this response:
 
 ```
 {
-   "id": "uuid",
+   "id": "UUID",
    "name": "deploy-service",
    "number": 5327,
    "type": "build",

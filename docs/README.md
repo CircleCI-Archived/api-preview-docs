@@ -1,7 +1,7 @@
 # CircleCI API v2 Preview Documentation
 
 ## BEFORE YOU START: IMPORTANT DISCLAIMER
-The CircleCI v2 API is currently in Preview release. You may use it at will, but this evaluation product is not yet fully supported or considered generally available. We have no plans to change any live endpoints in v2, and we are treating it as production software, but the risk of disruption or breaking changes is higher than our generally available features.
+The CircleCI v2 API is currently in Preview release. You may use it at will, but this evaluation product is not yet fully supported or considered generally available. We have no plans to change any live endpoints in v2, and we are treating it as production software, but the risk of disruption or breaking changes is higher than our generally available features. All breaking changes will be announced ahead of time in our [breaking changes log](breaking.md) 
 
 Use of the v2 API as long as this notice is in the master branch (current as of June 2019) is done at your own risk and is governed by CircleCI’s Terms of Service.
 

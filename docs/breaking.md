@@ -7,6 +7,10 @@
 
 # Proposed Breaking Changes
 
+## Oct 25, 2019
+
+Fixed some typos and clarified some of the changes, specifically around pluralization and error responses.
+
 ## Oct 23, 2019
 
 The API v2 preview was made available earlier this year with the intent of exposing [new workflow and pipeline control endpoints](https://github.com/CircleCI-Public/api-preview-docs/blob/master/docs/api-changes.md#new-endpoints-available-for-preview-use) to our API users. With the v2 Preview endpoints in place, the team at CircleCI also began to migrate API v1 and v1.1 endpoints into v2.
@@ -61,32 +65,29 @@ For example, you will see this error code when a resource is not found, or if th
 Generally responds with:
 
 ```
-{
-    "errors": [{"type":  "error-type",
-                "value": "some value"}...]
-}
+{"message": "some-entity-name not found."}
 ```
 
 For example, you will typically see this error code when query parameters are missing or invalid, or if the request body is invalid.
 
 #### Server Fault Codes
 
-The relevant HTTP 5xx status codes will be used in the situation where a server error occurs. The return body will contain a message explaining the error. For example:
+The relevant HTTP 5xx status codes will be used in the situation where a server error occurs. The return body will contain a message. For example:
 
 - 500 Internal Server Error - responds with `{"message": "Internal server error."}`
 - 503 Service Unavailable - responds with `{"message": "Service unavailable."}`
 
 ### Changes to Routes
 
-- [Get Test Metadata](https://circleci.com/docs/api/v2/#get-test-metadata) endpoint will move from `/project/{project-slug}/{job-number}/tests` to `/project/{project-slug}/jobs/{job-number}/tests`. Note the addition of `jobs/` to the route
+- [Get Test Metadata](https://circleci.com/docs/api/v2/#get-test-metadata) endpoint will move from `/project/{project-slug}/{job-number}/tests` to `/projectS/{project-slug}/jobs/{job-number}/tests`. Note the addition of `jobs/` to the route
 - References to `project/` will be pluralized to `projectS/` e.g.
   - `/project/{project-slug}` -> `/projects/{project-slug}`
-  - `/project/{project-slug}/job/{job-number}` -> `/projects/{project-slug}/job/{job-number}`
+  - `/project/{project-slug}/job/{job-number}` -> `/projects/{project-slug}/jobs/{job-number}`
 - References to `pipeline/` will be pluralized to `pipelineS/` e.g.
   - `/pipeline/{pipeline-id}` -> `pipelineS/{pipeline-id}`
   - `/pipeline/{pipeline-id}/config` -> `/pipelineS/{pipeline-id}/config`
 - References to `job/` will be pluralized to `jobS/` e.g.
-  - `/project/{project-slug}/job/{job-number}` -> `/project/{project-slug}/jobS/{job-number}`
+  - `/project/{project-slug}/job/{job-number}` -> `/projectS/{project-slug}/jobS/{job-number}`
 - References to `workflow/` will be pluralized to `workflowS/` e.g.
   - `/workflow/{id}` -> `/workflowS/{id}`
 

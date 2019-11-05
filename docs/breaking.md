@@ -12,7 +12,7 @@
 ### Nov 5, 2019
 
 - Route changes will not be pluralized, instead they will be all singular
-- `workflows` will be removed from the [Get a pipeline](https://circleci.com/docs/api/v2/#get-a-pipeline) response. This information will now be retrieved in two new endpoints: get workflows by pipeline and get scheduled workflows by pipeline
+- `workflows` will be removed from the [Get a pipeline](https://circleci.com/docs/api/v2/#get-a-pipeline) response. This information will now be retrieved in two new endpoints: get workflows by pipeline and get scheduled workflows by project
 
 ### Oct 25, 2019
 
@@ -105,5 +105,5 @@ The relevant HTTP 5xx status codes will be used in the situation where a server 
 #### Get a Pipeline
 A pipeline could potentially have an unbounded set of workflows associated with it. For that reason we are removing `workflow` from the [get a pipeline](https://circleci.com/docs/api/v2/#get-a-pipeline) response and introducing two new endpoints:
 
-1. Get a pipeline's workflow `GET /pipeline/{pipeline-id}/workflow`
-2. Get a pipeline's scheduled workflow `GET /project/{project-slug}/scheduled-workflow`
+1. Get a pipeline's workflows `GET /pipeline/{pipeline-id}/workflow`
+2. Get project's scheduled workflows `GET /project/{project-slug}/scheduled-workflow`

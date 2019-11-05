@@ -42,7 +42,7 @@ curl -u ${CIRCLECI_TOKEN}: -X POST --header "Content-Type: application/json" -d 
     "workingdir": "./myspecialdir",
     "image-tag": "4.8.2"
   }
-}' https://circleci.com/api/v2/project/:vcs-type/:username/:project/pipeline
+}' https://circleci.com/api/v2/project/:project_slug/pipeline
 ```
 
 ## The scope of pipeline parameters

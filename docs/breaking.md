@@ -12,7 +12,9 @@
 ### Nov 5, 2019
 
 - Route changes will not be pluralized, instead they will be all singular
-- `workflows` will be removed from the [Get a pipeline](https://circleci.com/docs/api/v2/#get-a-pipeline) response. This information will now be retrieved in two new endpoints: get workflows by pipeline and get scheduled workflows by project
+- `workflows` will be removed from the [Get a pipeline](https://circleci.com/docs/api/v2/#get-a-pipeline) response. This information will now be retrieved in two new endpoints: 
+   - Get workflows by pipeline `GET /pipeline/{pipeline-id}/workflow`
+   - Get scheduled workflows by project `GET /project/{project-slug}/scheduled-workflow`
 
 ### Oct 25, 2019
 

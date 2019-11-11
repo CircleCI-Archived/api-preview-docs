@@ -1,5 +1,9 @@
 # Breaking Changes
 
+## Nov 11, 2019
+
+- The `/workflow/:workflow-id/jobs` endpoint has been moved to `/workflow/:workflow-id/job` for consistency. The old route is still working at this point in time, but deprecated and will be removed on November 18th, 2019.
+
 ## Oct 17, 2019
 
 - `start_time` and `stop_time` parameters have been renamed to `started_at` and `stopped_at` to be consistent with other time-based information fields like `created_at` and `queued_at`. This change affects the [Get a Workflow's Job](https://circleci.com/docs/api/v2/#get-a-workflow-39-s-jobs) endpoint

@@ -34,7 +34,7 @@ automatically, so trying out pipelines on a branch this way only
 requires upgrading the configuration version.
 
 This also allows use of the 2.1-exclusive features, like pipeline
-variables.
+values.
 
 ### Using the `experimental` Stanza
 

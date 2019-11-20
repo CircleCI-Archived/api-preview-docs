@@ -33,13 +33,6 @@ orbs:
                 store_artifacts:
                   path: << parameters.publish-dir >>
 jobs:
-  validate:
-    executor: tools/default
-    steps:
-      - run: sudo npm install -g swagger-cli
-      - checkout
-      - run: swagger-cli validate "<< pipeline.parameters.spec-root >>v2-sketch.yaml"
-
   generate-docs:
     executor: spectacle/default
     steps:
@@ -50,6 +43,5 @@ jobs:
 workflows:
   main:
     jobs:
-      - validate
       - generate-docs
 

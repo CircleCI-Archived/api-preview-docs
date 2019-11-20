@@ -22,13 +22,15 @@ workflows:
     when: << pipeline.parameters.run_integration_tests >>
     jobs:
       - mytestjob
+
+jobs:
+  mytestjob:
+    steps:
+      - checkout
       - when:
           condition: << pipeline.parameters.deploy >>
           steps:
-            - deploy
-
-jobs:
-  ...
+            - run: echo "deploying"
 ```
 
 The above would prevent the workflow `integration_tests` from being triggered

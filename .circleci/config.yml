@@ -43,6 +43,5 @@ jobs:
 workflows:
   main:
     jobs:
-      - validate
       - generate-docs
 

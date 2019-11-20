@@ -6,7 +6,7 @@ This repository has information about the preview release of CircleCI API v2.
 
 * See the [documentation](docs/) in this repository for reference information. 
 * Breaking changes to the API will be announced in this document [breaking](docs/breaking.md).
-* Also check out our [OpenAPI spec](specs/), something we are piloting as part of the v2 launch.
+* API v2 keeps an updated openapi spec that you can find [here](https://circleci.com/api/v2/openapi.json)
 
 ## FEEDBACK
 We welcome your feedback on the v2 API. A few ways to reach us include:

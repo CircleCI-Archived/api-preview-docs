@@ -1,6 +1,9 @@
 #! /bin/bash
+set -e
+set -o pipefail
+set -o functrace
 
-
+# TODO: Not tolerant of initial trigger failing to create any workflows in time - should have some retry logic.
 # TODO: Does not check for pipeline errors
 # TODO: Does not know all possible status values for workflows
 # TODO: Only gets jobs for workflows still running when initially retrieved
@@ -23,6 +26,7 @@ path_to_cli_config='~/.circleci/cli.yml'
 circleci_root='https://circleci.com/'
 api_root="${circleci_root}api/v2/"
 cli_config_path="${HOME}/.circleci/cli.yml"
+
 # branch="tryapi"
 
 #********************
@@ -101,8 +105,12 @@ ensure_project_slug () {
   project_name=$(awk -F/ '{print $3}' <<< $project_slug)
 }
 
+
+
 post () {
   local url="${api_root}${1}"
+  printf "HTTP POST ${url}\n\n" > /dev/tty
+
   curl -su ${circle_token}: -X POST \
        --header "Content-Type: application/json" \
        -d "$2"\
@@ -111,6 +119,7 @@ post () {
 
 get () {
   local url="${api_root}${1}"
+  printf "HTTP GET ${url}\n\n" > /dev/tty
   curl -su ${circle_token}: \
        --header "Content-Type: application/json" \
        "${url}"
@@ -172,6 +181,8 @@ step "Successfully created pipeline with ID $pipeline_id"
 get_path="pipeline/${pipeline_id}"
 step "GET pipeline by ID: /${get_path} - the raw payload is below"
 result=$(get $get_path)
+workflow_count=$(echo $result | jq -r '.workflows | length' )
+
 pretty_json $result
 
 #********************
@@ -181,12 +192,12 @@ section 'GET THE WORKFLOWS FOR THE ABOVE PIPELINE'
 
 # jq -r .workflows.ids[] <<<$result
 
-workflow_count=$(echo $result | jq -r .workflows.total_count)
+
 step "You should now be able to see the ${workflow_count} workflow(s) for this pipeline here:"
 workflow_url_for_project="${circleci_root}${vcs_slug}/${org_name}/workflows/${project_name}"
 echo $workflow_url_for_project
 echo ""
-workflow_ids=($(echo $result | jq -r '.workflows.ids[] | @sh'))
+workflow_ids=($(echo $result | jq -r '.workflows[].id | @sh'))
 #DUMB HACK TO STRIP SINGLE QUOTES THAT CAN LIKELY BE SOLVED MORE ELEGANTLY
 workflow_ids=(${workflow_ids[@]//\'/})
 step "Now let's loop over the ${workflow_count} workflow(s) and get info about each one"
@@ -219,6 +230,7 @@ for i in "${!running_workflows[@]}"; do
   echo "${circleci_root}workflow-run/${id}"
   printf "polling, please wait..."
   while [ $still_running ]; do
+    ((loops+=1))
     result=$(get $get_path)
     status=$(echo $result | jq -r '.status')
     if [[ $status != "running" ]]; then
@@ -231,9 +243,9 @@ for i in "${!running_workflows[@]}"; do
       pretty_json $result
       break
     else
-      printf "."
-      let loops++
       sleep $wait
+      printf "."
+      continue
     fi
     if [[ $loops == $maxloops ]]; then
       echo "Max loops of ${maxloops} has been reached, so stopping querying for this workflow."
@@ -247,7 +259,7 @@ done
 # *******************
 section 'GET RECENT PIPELINES'
 get_path="project/${project_slug}/pipeline"
-step "GET recent pipelines for project ${project_slug}  - The latest two from .items are below"
+step "GET recent pipelines for project ${project_slug}  - The latest two from '.items' are below"
 result=$(get $get_path)
 echo $result | jq .items[0:2]
 

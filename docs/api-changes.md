@@ -28,7 +28,7 @@ Note, all endpoints below are relative to:
 ### GET /workflow/:id
 Retrieve an individual workflow by its unique ID.
 
-### GET /workflow/:id/jobs
+### GET /workflow/:id/job
 Retrieve the jobs of an individual workflow by its unique ID. Note that for now we're returning all jobs, but we reserve the right to paginate them in the future. The shape of the pagination will not change, but the default number of jobs may be reduced.
 
 ### GET /project/:project_slug

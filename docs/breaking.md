@@ -11,7 +11,7 @@ Instances where the `workflow` key is being referenced from the [Get a pipeline]
 
 ## Nov 11, 2019
 
-The `/workflow/:workflow-id/jobs` endpoint has been moved to `/workflow/:workflow-id/job` for consistency. The old route is still working at this point in time, but deprecated and will be removed on November 18th, 2019.
+The `/workflow/:workflow-id/jobs` endpoint has been moved to `/workflow/:workflow-id/job` for consistency. The old route was removed on November 20th, 2019.
 
 ## Oct 17, 2019
 

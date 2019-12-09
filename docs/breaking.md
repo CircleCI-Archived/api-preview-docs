@@ -1,5 +1,8 @@
 # Breaking Changes
 
+## Dec 9, 2019
+The `workflow` key in the [Get a pipeline](https://circleci.com/docs/api/v2/#get-a-pipeline) `GET /pipeline/{pipeline-id}` response is now deleted
+
 ## Nov 21, 2019
 
 The endpoint to [Get a pipeline's workflows](https://circleci.com/docs/api/v2/#get-a-pipeline-39-s-workflows) `GET /pipeline/{pipeline-id}/workflow` has been released. 

@@ -20,6 +20,10 @@ The CircleCI v2 API is backwards compatible with previous API versions in the wa
 
 With API v2 we are introducing a string representation of the triplet called the `project_slug`, takes the form: `<project_type>/<org_name>/<repo_name>`. The `project_slug` is included in the payload when pulling information about a project as well as when looking up a pipeline or workflow by ID. The `project_slug` can then be used to get information about the project. It's possible in the future we could change the shape of a `project_slug`, but in all cases it would be usable as a human-readable identifier for a given project.
 
+## NEW: Insights API
+
+With CircleCI v2 Insights API, you can view the recent runs of your named workflows. The insights API contains status, duration and credits consumed information.
+
 ## NEW ENDPOINTS AVAILABLE FOR PREVIEW USE.
 Note, all endpoints below are relative to:
 
@@ -63,6 +67,15 @@ Use the new `when` clause under a workflow, you can use the value of a boolean p
 ### GET openapi.json or GET openapi.yml
 Gives you the current production OpenAPI spec for the v2 API (eg: <https://circleci.com/api/v2/openapi.json> )
 
+### GET /insights/:project-slug/workflows/:workflow-name?branch=``
+Retrieve the recent 250 runs (within the last 90 days) of a named workflow for a specified branch. If no branch is selected, CircleCI will provide data for the default branch. The payload contains the following fields:
+
+- Workflow ID
+- Status 
+- Credits used 
+- Duration (seconds)
+- Created at (UTC)
+- Stopped at (UTC)
 
 ## Endpoints likely being removed in API v2 (still available in v1.1 for now)
 ### POST    /project/:vcs-type/:username/:project

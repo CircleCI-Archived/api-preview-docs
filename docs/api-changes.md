@@ -67,12 +67,26 @@ Use the new `when` clause under a workflow, you can use the value of a boolean p
 ### GET openapi.json or GET openapi.yml
 Gives you the current production OpenAPI spec for the v2 API (eg: <https://circleci.com/api/v2/openapi.json> )
 
-### GET /insights/:project-slug/workflows/:workflow-name?branch=``
-Retrieve the recent 250 runs (within the last 90 days) of a named workflow for a specified branch. If no branch is selected, CircleCI will provide data for the default branch. The payload contains the following fields:
+### GET /insights/:project-slug/workflows?branch=":branch-name"
+Retrieve aggregate data about project workflows for a specified branch. The aggregation window is the shorter of the last 90 days, or the last 250 executions. If no branch is selected, CircleCI will provided data for the default branch. The payload contains the following fields:
+
+- Workflow name
+- Aggregation window start (UTC)
+- Aggregation window end (UTC)
+- Successful runs
+- Failed runs
+- Total runs
+- Success rate
+- Throughput (average number of runs / day)
+- Total credits used
+- Duration statistics: max, min, mean, median, p95, standard deviation (all in seconds)
+
+### GET /insights/:project-slug/workflows/:workflow-name?branch=":branch-name"
+Retrieve the recent 250 runs (within the last 90 days) of a named project workflow for a specified branch. If no branch is selected, CircleCI will provide data for the default branch. The payload contains the following fields:
 
 - Workflow ID
-- Status 
-- Credits used 
+- Status
+- Credits used
 - Duration (seconds)
 - Created at (UTC)
 - Stopped at (UTC)

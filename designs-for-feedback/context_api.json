@@ -1,0 +1,884 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Contexts API",
+        "version": "v2",
+        "description": "This describes a proposed API schema for Contexts. For more information, contact [Vinny Thanh](mailto:mthanh@circleci.com?Subject=Context%20API%20Preview) or [Nathan Dintenfass](mailto:nathan@circleci.com?Subject=Context%20API%20Preview)",
+        "license": {
+            "name": "MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "https://circleci.com/api/v2"
+        },
+        {
+            "url": "https://88523cbe-93b0-4b85-9fd0-33f8ce3c0a83.mock.pstmn.io"
+        }
+    ],
+    "security": [
+        { "api_key_query" : [ ] },
+        { "api_key_header" : [ ] },
+        { "basic_auth" : [ ] } 
+    ],
+    "paths" : {
+        "/{org-slug}/context": {
+            "get" : {
+                "summary": "List all contexts within organization.",
+                "description": "Returns all contexts for this organization.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "listContextsForOrg",
+                "parameters" : [ {
+                    "in" : "path",
+                    "name" : "org-slug",
+                    "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                    "schema" : {
+                        "type" : "string"
+                    },
+                    "required" : true,
+                    "example" : "gh/CircleCI-Public",
+                    "allowReserved" : true
+                } ],
+                "responses": {
+                    "200": {
+                        "description": "A sequence of contexts.",
+                        "links": {
+                            "NextContextPage": {
+                                "operationId": "listContextsForOrg",
+                                "parameters": {
+                                    "org-slug": "$request.path.org-slug",
+                                    "page-token": "$response.body#/next_page_token"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "ContextListResponse",
+                                    "description": "List of contexts",
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "format": "uuid",
+                                                        "description": "The unique ID of the context."
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "The name of the context.",
+                                                        "example": "Example-Context"
+                                                    },
+                                                    "groups": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "description": "The name of a group that can access this context.",
+                                                            "example": "Example-Group"
+                                                        }
+                                                    },
+                                                    "created_at" : {
+                                                        "type" : "string",
+                                                        "format" : "date-time",
+                                                        "description" : "The date and time the context was created."
+                                                    },
+                                                    "updated_at" : {
+                                                        "type" : "string",
+                                                        "format" : "date-time",
+                                                        "description" : "The date and time the context was last updated."
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "next_page_token": {
+                                            "type": "string",
+                                            "x-nullable": true,
+                                            "description": "A token to pass as a `page-token` query parameter to return the next page of results."
+                                        }
+                                    },
+                                    "required": [
+                                        "items",
+                                        "next_page_token"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post" : {
+                "summary": "Create a context.",
+                "description": "Creates a context for this organization.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "createContextForOrg",
+                "parameters" : [ {
+                    "in" : "path",
+                    "name" : "org-slug",
+                    "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                    "schema" : {
+                        "type" : "string"
+                    },
+                    "required" : true,
+                    "example" : "gh/CircleCI-Public",
+                    "allowReserved" : true
+                } ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "title": "Context",
+                                "description": "The details of the context to create.",
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "The name of the context to create.",
+                                        "example": "Example-Context"
+                                    },
+                                    "groups": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "description": "The name(s) of the group(s) that can access this context.",
+                                            "example": "Example-Group"
+                                        }
+                                    }
+                                },
+                                "required": [ "name" ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The context object.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Context",
+                                    "description": "The details of the context.",
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "format": "uuid",
+                                            "description": "The unique ID of the context."
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "The name of the context.",
+                                            "example": "Example-Context"
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "The name(s) of the group(s) that can access this context.",
+                                                "example": "Example-Group"
+                                            }
+                                        },
+                                        "created_at" : {
+                                            "type" : "string",
+                                            "format" : "date-time",
+                                            "description" : "The date and time the context was created."
+                                        },
+                                        "updated_at" : {
+                                            "type" : "string",
+                                            "format" : "date-time",
+                                            "description" : "The date and time the context was last updated."
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name",
+                                        "created_at",
+                                        "updated_at"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/{org-slug}/context/{context-id}": {
+            "get" : {
+                "summary": "Get a context by ID.",
+                "description": "Returns a context by ID.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "getContextById",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A context object.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Context",
+                                    "description": "The details of the context.",
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "format": "uuid",
+                                            "description": "The unique ID of the context."
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "The name of the context.",
+                                            "example": "Example-Context"
+                                        },
+                                        "groups": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "The name(s) of the group(s) that can access this context.",
+                                                "example": "Example-Group"
+                                            }
+                                        },
+                                        "envvars": {
+                                            "type": "array",
+                                            "items": {
+                                                "title": "EnvironmentVariablePair",
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "The name of the environment variable.",
+                                                        "example": "foo"
+                                                    },
+                                                    "value": {
+                                                        "type": "string",
+                                                        "description": "The value of the environment variable.",
+                                                        "example": "xxxx1234"
+                                                    }
+                                                },
+                                                "required": [ "name", "value" ]
+                                            }
+                                        },
+                                        "created_at" : {
+                                            "type" : "string",
+                                            "format" : "date-time",
+                                            "description" : "The date and time the context was created."
+                                        },
+                                        "updated_at" : {
+                                            "type" : "string",
+                                            "format" : "date-time",
+                                            "description" : "The date and time the context was last updated."
+                                        }
+                                    },
+                                    "required": [
+                                        "id",
+                                        "name",
+                                        "created_at",
+                                        "updated_at"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a context by ID.",
+                "description": "Deletes a context by ID.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "getContextById",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A confirmation message.",
+                        "content": {
+                            "application/json": {
+                                "schema" : {
+                                    "title" : "MessageResponse",
+                                    "description": "A message response.",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "message" : {
+                                            "type" : "string",
+                                            "description" : "A human-readable message."
+                                        }
+                                    },
+                                    "required" : [ "message" ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "An error message.",
+                        "content": {
+                            "application/json": {
+                                "schema" : {
+                                    "title" : "ErrorMessageResponse",
+                                    "description": "An error message response.",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "message" : {
+                                            "type" : "string",
+                                            "description" : "A human-readable error message."
+                                        }
+                                    },
+                                    "required" : [ "message" ]
+                                }
+                            }
+                        }
+                    }  
+                }
+            }
+        },
+        "/{org-slug}/context/{context-id}/envvar": {
+            "get": {
+                "summary": "List all environment variables within context.",
+                "description": "Returns a list of all environment variables for context {context-id}.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "listContextEnvVars",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A sequence of environment variables.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "EnvironmentVariableListResponse",
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "title": "EnvironmentVariablePair",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "The name of the environment variable.",
+                                                        "example": "foo"
+                                                    },
+                                                    "value": {
+                                                        "type": "string",
+                                                        "description": "The value of the environment variable.",
+                                                        "example": "xxxx1234"
+                                                    }
+                                                },
+                                                "required": [ "name", "value" ]
+                                            }
+                                        },
+                                        "next_page_token" : {
+                                            "type" : "string",
+                                            "x-nullable" : true,
+                                            "description" : "A token to pass as a `page-token` query parameter to return the next page of results."
+                                        }
+                                    },
+                                    "required": [
+                                        "items",
+                                        "next_page_token"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post" : {
+                "summary": "Create a new environmental variable.",
+                "description": "Creates a new environment variable within this context.",
+                "tags": [
+                    "Context"
+                ],
+                "operationId": "createContextEnvVar",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "title" : "EnvironmentVariablePair",
+                                "type" : "object",
+                                "properties" : {
+                                    "name" : {
+                                        "type" : "string",
+                                        "description" : "The name of the environment variable.",
+                                        "example" : "foo"
+                                    },
+                                    "value" : {
+                                        "type" : "string",
+                                        "description" : "The value of the environment variable.",
+                                        "example" : "Example1234"
+                                    }
+                                },
+                                "required" : [ "name", "value" ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "The environment variable.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title" : "EnvironmentVariablePair",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "name" : {
+                                            "type" : "string",
+                                            "description" : "The name of the environment variable.",
+                                            "example" : "foo"
+                                        },
+                                        "value" : {
+                                            "type" : "string",
+                                            "description" : "The value of the environment variable.",
+                                            "example" : "xxxx1234"
+                                        }
+                                    },
+                                    "required" : [ "name", "value" ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/{org-slug}/context/{context-id}/envvar/{name}": {
+            "get" : {
+                "summary": "Get an environment variable within a context by name.",
+                "description": "Returns the masked value of the environment variable {name} within context {context-id}.",
+                "tags": [
+                    "Context"  
+                ],
+                "operationId": "getContextEnvVar",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "name",
+                        "description" : "The name of the environment variable.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "foo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The environment variable.",
+                        "content": {
+                            "application/json": {
+                                "schema" : {
+                                    "title" : "EnvironmentVariablePair",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "name" : {
+                                            "type" : "string",
+                                            "description" : "The name of the environment variable.",
+                                            "example" : "foo"
+                                        },
+                                        "value" : {
+                                            "type" : "string",
+                                            "description" : "The value of the environment variable.",
+                                            "example" : "xxxx1234"
+                                        }
+                                    },
+                                    "required" : [ "name", "value" ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete" : {
+                "summary": "Delete an environment variable within a context by name.",
+                "description": "Deletes the environment variable {name}.",
+                "tags": [
+                    "Context"  
+                ],
+                "operationId": "deleteContextEnvVar",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "name",
+                        "description" : "The name of the environment variable.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "foo"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A confirmation message.",
+                        "content": {
+                            "application/json": {
+                                "schema" : {
+                                    "title" : "MessageResponse",
+                                    "description": "A message response.",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "message" : {
+                                            "type" : "string",
+                                            "description" : "A human-readable message."
+                                        }
+                                    },
+                                    "required" : [ "message" ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/{org-slug}/context/{context-id}/group": {
+            "get": {
+                "summary": "List all groups with access to this context.",
+                "description": "Returns a list of all groups with access to context {context-id}.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "listContextGroups",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of groups.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "ContextGroupListResponse",
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "The name of a group that can access this context.",
+                                                "example": "Example-Group"
+                                            }
+                                        },
+                                        "next_page_token" : {
+                                            "type" : "string",
+                                            "x-nullable" : true,
+                                            "description" : "A token to pass as a `page-token` query parameter to return the next page of results."
+                                        }
+                                    },
+                                    "required": [
+                                        "items",
+                                        "next_page_token"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Give a group access to this context.",
+                "description": "Adds a group to a list of groups with access to context {context-id}.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "addContextGroup",
+                "parameters" : [ 
+                    {
+                        "in" : "path",
+                        "name" : "org-slug",
+                        "description" : "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema" : {
+                            "type" : "string"
+                        },
+                        "required" : true,
+                        "example" : "gh/CircleCI-Public",
+                        "allowReserved" : true
+                    },
+                    {
+                        "in" : "path",
+                        "name" : "context-id",
+                        "description" : "The unique ID of the context.",
+                        "schema" : {
+                            "type" : "string",
+                            "format": "uuid"
+                        },
+                        "required" : true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "title": "ContextGroup",
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "The name of the group to allow access to this context.",
+                                        "example": "Example-Group"
+                                    }
+                                },
+                                "required": [ "name" ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "A list of groups with access to this context.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "ContextGroupListResponse",
+                                    "type": "object",
+                                    "properties": {
+                                        "items": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "description": "The name of a group that can access this context.",
+                                                "example": "Example-Group"
+                                            }
+                                        },
+                                        "next_page_token" : {
+                                            "type" : "string",
+                                            "x-nullable" : true,
+                                            "description" : "A token to pass as a `page-token` query parameter to return the next page of results."
+                                        }
+                                    },
+                                    "required": [
+                                        "items",
+                                        "next_page_token"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/{org-slug}/context/{context-id}/group/{name}": {
+            "delete": {
+                "summary": "Remove a group's access to this context.",
+                "description": "Removes a group from the list of groups with access to context {context-id}.",
+                "tags": [
+                    "Context", "Preview"
+                ],
+                "operationId": "deleteContextGroup",
+                "parameters": [ 
+                    {
+                        "in": "path",
+                        "name": "org-slug",
+                        "description": "Organization slug in the form `vcs-slug/org-name`.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "example": "gh/CircleCI-Public"
+                    },
+                    {
+                        "in": "path",
+                        "name": "context-id",
+                        "description": "The unique ID of the context.",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "name",
+                        "description" : "The name of the group.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "example": "Example-Group"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A confirmation message.",
+                        "content": {
+                            "application/json": {
+                                "schema" : {
+                                    "title" : "MessageResponse",
+                                    "description": "A message response.",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "message" : {
+                                            "type" : "string",
+                                            "description" : "A human-readable message."
+                                        }
+                                    },
+                                    "required" : [ "message" ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

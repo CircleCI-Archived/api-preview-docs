@@ -1,5 +1,24 @@
 # CircleCI API Preview
 
-This repository has information about the pre-release preview of CircleCI API v2.
+This repository has information about the preview release of CircleCI API v2.
 
-**NOTE: While we hope those using this preview can rely on it to do solid testing, The APIs DESCRIBED HERE ARE IN PROGRESS SOFTWARE SUBJECT TO BREAKING CHANGES WITHOUT NOTICE. THE PREVIEW IS PROVIDED AS-IS WITH NO WARRANTY OR OTHER REPRESENTATION OF PRODUCTION QUALITY. **
+## DEVELOPING WITH CIRCLECI API v2
+
+* See the [documentation](docs/) in this repository for reference information.
+* Also checkout our [OpenAPI spec](specs/), something we are piloting as part of the v2 launch.
+
+## FEEDBACK
+We welcome your feedback on the v2 API. A few ways to reach us include:
+* Feel free to use Issues on this repository for feature requests or bug reports.
+* Talk to your account team at CircleCI, or ask them to set up time to speak with us about your needs.
+* Tweet @circleci and mention API v2 - we tend to see those within a day or two.
+
+## NEXT STEPS
+* Read the [docs](docs/) in this repository for details.
+
+
+
+
+
+
+

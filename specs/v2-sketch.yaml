@@ -1,612 +1,902 @@
-openapi: "3.0.0"
+openapi: 3.0.0
 info:
   version: 1.0.0
   title: CircleCI API v2
   license:
     name: MIT
 servers:
-  - url: http://circleci.com/api/v2
+- url: https://circleci.com/api/v2
+security:
+- api_key_query: []
+- api_key_header: []
+- basic_auth: []
 paths:
-  /me:
-    get:
-      summary: Return basic user information of the owner of the requested token
-      operationId: me
-      responses:
-        '200':
-          description: A map of simple user information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Me"
-  /project/{project_slug}:
-    get:
-      summary: Get a project
-      operationId: getProjectBySlug
-      parameters:
-        - $ref: "#/components/parameters/ProjectSlug"
-      responses:
-        '200':
-          description: A project object
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Project"
-  /project/{project_slug}/pipeline:
-    post:
-      summary: Trigger a new pipeline for a project
-      operationId: triggerNewPipeline
-      parameters:
-        - $ref: "#/components/parameters/ProjectSlug"
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/TriggerPipelineRequest"
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TriggerPipelineRequest"
-      responses:
-        '200':
-          description: Newly created pipeline data
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                  - number
-                  - state
-                  - created_at
-                additionalProperties: false
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-                  number:
-                    type: number
-                    format: integer
-                  state:
-                    type: string
-                    enum: ["pending", "created", "errored"]
-                  created_at:
-                    type: string
-                    format: date-time
-          links:
-            TriggeredPipeline:
-              operationId: getPipelineById
-              parameters:
-                id: "$response.body#/pipeline_id"
-  /pipeline/{id}:
+  /pipeline/{pipeline-id}:
     get:
       summary: Return a pipeline by ID
       operationId: getPipelineById
-      parameters:
-        - name: id
-          in: path
-          description: ID of the pipeline
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
-        '200':
+        200:
           description: A pipeline object
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Pipeline"
           links:
             ProjectFromPipeline:
               operationId: getProjectById
               parameters:
-                project_slug: "$response.body#/project_slug"
-  /pipeline/{id}/config:
+                project_slug: $response.body#/project_slug
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/id
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          enum:
+                          - config
+                          - plan
+                          type: string
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline.error/type
+                        message:
+                          type: string
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline.error/message
+                      required:
+                      - type
+                      - message
+                      description: TBD
+                      title: circle.http.api.v2.entities.pipeline.error/error
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/errors
+                  idempotency_key:
+                    type: string
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/idempotency_key
+                    example: 31fe2a48898d2f3ac09242f82619c4ad9f5a3bbc456806c5465c336e5ab68db4
+                  project_slug:
+                    type: string
+                    description: TBD
+                    example: gh/CircleCI-Public/api-preview-docs
+                    title: circle.http.api.v2.entities.pipeline/project_slug
+                  updated_at:
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/updated_at
+                  number:
+                    type: integer
+                    format: int64
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/number
+                  state:
+                    enum:
+                    - created
+                    - running
+                    - failed
+                    - errored
+                    - successful
+                    - on_hold
+                    - blocked
+                    - pending
+                    - canceled
+                    type: string
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/state
+                  created_at:
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/created_at
+                  trigger:
+                    type: object
+                    properties:
+                      type:
+                        enum:
+                        - explicit
+                        - api
+                        - webhook
+                        type: string
+                        description: The type of the trigger
+                        title: circle.http.api.v2.entities.trigger/type
+                      received_at:
+                        description: The timestamp that the trigger was received at.
+                        title: circle.http.api.v2.entities.trigger/received_at
+                    required:
+                    - type
+                    - received_at
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/trigger
+                  vcs:
+                    type: object
+                    properties:
+                      provider_name:
+                        type: string
+                        description: Name of the VCS provider
+                        title: circle.http.api.v2.entities.pipeline.vcs/provider_name
+                        example: GitHub
+                      origin_repository_url:
+                        type: string
+                        description: URL for the repository the trigger originated from. For fork-PR pipelines this is the URL to the fork, for other pipelines the `origin_` and `target_repository_url`s will be the same.
+                        title: circle.http.api.v2.entities.pipeline.vcs/origin_repository_url
+                        example: https://github.com/CircleCI-Public/api-preview-docs
+                      target_repository_url:
+                        type: string
+                        description: URL for the repository the trigger targets (i.e. the repository the PR will be merged into). For fork-PR pipelines this is the URL to the parent repo, for other pipelines the `origin_` and `target_repository_url`s will be the same.
+                        title: circle.http.api.v2.entities.pipeline.vcs/target_repository_url
+                        example: https://github.com/CircleCI-Public/api-preview-docs
+                      revision:
+                        type: string
+                        description: The revision of code that the pipeline ran.
+                        title: circle.http.api.v2.entities.pipeline.vcs/revision
+                        example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
+                      branch:
+                        type: string
+                        description: The branch the pipeline ran on. The HEAD commit on this branch was used for the pipeline. `branch` and `tag` are mutually exclusive.
+                        title: circle.http.api.v2.entities.pipeline.vcs/branch
+                        example: feature/design-new-api
+                      tag:
+                        type: string
+                        description: The tag the pipeline ran. The commit that this tag points to was used for the pipeline. `branch` and `tag` are mutually exclusive.
+                        title: circle.http.api.v2.entities.pipeline.vcs/tag
+                        example: v3.1.4159
+                    required:
+                    - provider_name
+                    - origin_repository_url
+                    - target_repository_url
+                    - revision
+                    description: VCS information for the pipeline
+                    title: circle.http.api.v2.entities.pipeline.vcs/vcs
+                required:
+                - id
+                - number
+                - project_slug
+                - created_at
+                - idempotency_key
+                - errors
+                - state
+                - trigger
+                description: 'NOTE: The definition of Pipeline is subject to change.'
+                title: circle.http.api.v2.entities.pipeline/pipeline
+      parameters:
+      - in: path
+        name: pipeline-id
+        description: TBD
+        schema:
+          type: string
+          format: uuid
+        required: true
+  /pipeline/{pipeline-id}/config:
     get:
       summary: Return a pipeline's configuration
       operationId: getPipelineConfigById
-      parameters:
-        - name: id
-          in: path
-          description: ID of the pipeline
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
-        '200':
+        200:
           description: The pipeline's configuration strings
           content:
             application/json:
               schema:
                 type: object
-                required:
-                  - source
-                  - compiled
                 properties:
                   source:
-                    description: |
-                      The source config for the pipeline, before any config
-                      compilation has been performed. If there is no config
-                      this field will be empty.
                     type: string
+                    description: The source config for the pipeline, before any config compilation has been performed. If there is no config this field will be empty.
+                    title: circle.http.api.v2.entities.pipeline.config/source
                   compiled:
-                    description: |
-                      The compiled config for the pipeline, after all orb
-                      expansion has been performed. If there were errors
-                      processing the pipeline's configuration this field may be
-                      empty.
                     type: string
-  /workflow/{id}:
-    get:
-      summary: Return summary fields of a workflow by ID
-      operationId: getWorkflowById
+                    description: The compiled config for the pipeline, after all orb expansion has been performed. If there were errors processing the pipeline's configuration this field may be empty.
+                    title: circle.http.api.v2.entities.pipeline.config/compiled
+                required:
+                - source
+                - compiled
+                description: The pipeline's configuration strings
+                title: circle.http.api.v2.entities.pipeline.config/pipeline-config
       parameters:
-        - name: id
-          in: path
-          description: ID of the workflow
-          required: true
-          schema:
-            type: string
-            format: uuid
+      - in: path
+        name: pipeline-id
+        description: TBD
+        schema:
+          type: string
+          format: uuid
+        required: true
+  /project/{project-slug}/pipeline:
+    post:
+      summary: Trigger a new pipeline on the project
+      operationId: triggerPipeline
       responses:
-        '200':
-          description: An object with workflow information
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Workflow"
-          links:
-            ProjectFromGetWorkflow:
-              operationId: getProjectById
-              parameters:
-                project_slug: "$response.body#/project_slug"
-            WorkflowJobs:
-              operationId: getWorkflowJobsById
-              parameters:
-                id: "$response.body#/id"
-  /workflow/{id}/jobs:
-    get:
-      summary: Return all the known jobs of a given workflow
-      operationId: getWorkflowJobsById
-      parameters:
-        - name: id
-          in: path
-          description: ID of the workflow
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: page_token
-          in: query
-          description: Page token
-          schema:
-            type: string
-        - name: page_size
-          in: query
-          description: Number of jobs to return per page of results. This parameter may not be exposed initially.
-          schema:
-            type: number
-            format: integer
-            minimum: 10
-            maximum: 50
-      responses:
-        '200':
-          description: a paginated set of a workflow's jobs as an inverted adjacency list
+        202:
+          description: The created pipeline
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  next_page_token:
+                  id:
                     type: string
-                  jobs:
+                    format: uuid
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/id
+                  state:
+                    enum:
+                    - created
+                    - running
+                    - failed
+                    - errored
+                    - successful
+                    - on_hold
+                    - blocked
+                    - pending
+                    - canceled
+                    type: string
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/state
+                  number:
+                    type: integer
+                    format: int64
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/number
+                  created_at:
+                    description: TBD
+                    title: circle.http.api.v2.entities.pipeline/created_at
+                required:
+                - id
+                - state
+                - number
+                - created_at
+                description: 'NOTE: The definition of Pipeline is subject to change.'
+                title: circle.http.api.v2.entities.pipeline/pipeline-light
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
+          type: string
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+    get:
+      summary: Get all pipelines for this project
+      operationId: listPipelinesForProject
+      responses:
+        202:
+          description: a list of pipelines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Job"
-          links:
-            NextWorkflowJobPage:
-              operationId: getWorkflowJobsById
-              parameters:
-                id: "$request.query.id"
-                page_token: "$response.body#/next_page_token"
-components:
-  parameters:
-    ProjectSlug:
-      name: project_slug
-      in: path
-      description: |
-        Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
-      required: true
-      schema:
-        type: string
-        example: "gh/CircleCI-Public/api-preview-docs"
-      allowReserved: true
-  schemas:
-    Me:
-      # minimise breaking changes from /api/v1.1/me
-      # See https://github.com/circleci/circle/blob/gordon/disable-build-archive/src/circle/model/user.clj#L755-L765
-      type: object
-      properties:
-        login:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/id
+                        errors:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              type:
+                                enum:
+                                - config
+                                - plan
+                                type: string
+                                description: TBD
+                                title: circle.http.api.v2.entities.pipeline.error/type
+                              message:
+                                type: string
+                                description: TBD
+                                title: circle.http.api.v2.entities.pipeline.error/message
+                            required:
+                            - type
+                            - message
+                            description: TBD
+                            title: circle.http.api.v2.entities.pipeline.error/error
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/errors
+                        idempotency_key:
+                          type: string
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/idempotency_key
+                          example: 31fe2a48898d2f3ac09242f82619c4ad9f5a3bbc456806c5465c336e5ab68db4
+                        project_slug:
+                          type: string
+                          description: TBD
+                          example: gh/CircleCI-Public/api-preview-docs
+                          title: circle.http.api.v2.entities.pipeline/project_slug
+                        updated_at:
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/updated_at
+                        number:
+                          type: integer
+                          format: int64
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/number
+                        state:
+                          enum:
+                          - created
+                          - running
+                          - failed
+                          - errored
+                          - successful
+                          - on_hold
+                          - blocked
+                          - pending
+                          - canceled
+                          type: string
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/state
+                        created_at:
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/created_at
+                        trigger:
+                          type: object
+                          properties:
+                            type:
+                              enum:
+                              - explicit
+                              - api
+                              - webhook
+                              type: string
+                              description: The type of the trigger
+                              title: circle.http.api.v2.entities.trigger/type
+                            received_at:
+                              description: The timestamp that the trigger was received at.
+                              title: circle.http.api.v2.entities.trigger/received_at
+                          required:
+                          - type
+                          - received_at
+                          description: TBD
+                          title: circle.http.api.v2.entities.pipeline/trigger
+                        vcs:
+                          type: object
+                          properties:
+                            provider_name:
+                              type: string
+                              description: Name of the VCS provider
+                              title: circle.http.api.v2.entities.pipeline.vcs/provider_name
+                              example: GitHub
+                            origin_repository_url:
+                              type: string
+                              description: URL for the repository the trigger originated from. For fork-PR pipelines this is the URL to the fork, for other pipelines the `origin_` and `target_repository_url`s will be the same.
+                              title: circle.http.api.v2.entities.pipeline.vcs/origin_repository_url
+                              example: https://github.com/CircleCI-Public/api-preview-docs
+                            target_repository_url:
+                              type: string
+                              description: URL for the repository the trigger targets (i.e. the repository the PR will be merged into). For fork-PR pipelines this is the URL to the parent repo, for other pipelines the `origin_` and `target_repository_url`s will be the same.
+                              title: circle.http.api.v2.entities.pipeline.vcs/target_repository_url
+                              example: https://github.com/CircleCI-Public/api-preview-docs
+                            revision:
+                              type: string
+                              description: The revision of code that the pipeline ran.
+                              title: circle.http.api.v2.entities.pipeline.vcs/revision
+                              example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
+                            branch:
+                              type: string
+                              description: The branch the pipeline ran on. The HEAD commit on this branch was used for the pipeline. `branch` and `tag` are mutually exclusive.
+                              title: circle.http.api.v2.entities.pipeline.vcs/branch
+                              example: feature/design-new-api
+                            tag:
+                              type: string
+                              description: The tag the pipeline ran. The commit that this tag points to was used for the pipeline. `branch` and `tag` are mutually exclusive.
+                              title: circle.http.api.v2.entities.pipeline.vcs/tag
+                              example: v3.1.4159
+                          required:
+                          - provider_name
+                          - origin_repository_url
+                          - target_repository_url
+                          - revision
+                          description: VCS information for the pipeline
+                          title: circle.http.api.v2.entities.pipeline.vcs/vcs
+                      required:
+                      - id
+                      - number
+                      - project_slug
+                      - created_at
+                      - idempotency_key
+                      - errors
+                      - state
+                      - trigger
+                      description: 'NOTE: The definition of Pipeline is subject to change.'
+                      title: circle.http.api.v2.entities.pipeline/pipeline
+                  next-page-token:
+                    type: string
+                    x-nullable: true
+                    description: A token to pass as a `page-token` query parameter to retrieve the next page
+                    title: circle.http.api.v2.spec.common/next-page-token
+                required:
+                - items
+                - next-page-token
+                title: circle.http.api.v2.entities.pipeline/pipeline-list-response
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-        created_at:
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+  /project/{project-slug}/checkout-key:
+    get:
+      summary: Returns an array of checkout keys for `:project`.
+      operationId: listCheckoutKeys
+      responses:
+        200:
+          description: A list of checkout keys.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    public-key:
+                      type: string
+                      description: A public SSH key
+                      title: circle.http.api.v2.entities.checkout-key/public-key
+                      example: ssh-rsa ...
+                    type:
+                      enum:
+                      - deploy-key
+                      - github-user-key
+                      type: string
+                      description: Either `deploy-key` or `github-user-key`
+                      title: circle.http.api.v2.entities.checkout-key/type
+                      example: deploy-key
+                    fingerprint:
+                      type: string
+                      description: An SSH key fingerprint
+                      title: circle.http.api.v2.entities.checkout-key/fingerprint
+                      example: c9:0b:1c:4f:d5:65:56:b9:ad:88:f9:81:2b:37:74:2f
+                    preferred:
+                      type: boolean
+                      description: Indicates if this key is preferred
+                      title: circle.http.api.v2.entities.checkout-key/preferred
+                      example: true
+                    time:
+                      description: Timestamp of creation
+                      title: circle.http.api.v2.entities.checkout-key/time
+                      example: '2015-09-21T17:29:21.042Z'
+                  required:
+                  - public-key
+                  - type
+                  - fingerprint
+                  - preferred
+                  - time
+                  title: circle.http.api.v2.entities.checkout-key/checkout-key
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          format: date-time
-        name:
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+    post:
+      summary: Creates a new checkout key. This API request is only usable with a user API token.
+      operationId: createCheckoutKey
+      responses:
+        202:
+          description: The checkout key.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  public-key:
+                    type: string
+                    description: A public SSH key
+                    title: circle.http.api.v2.entities.checkout-key/public-key
+                    example: ssh-rsa ...
+                  type:
+                    enum:
+                    - deploy-key
+                    - github-user-key
+                    type: string
+                    description: Either `deploy-key` or `github-user-key`
+                    title: circle.http.api.v2.entities.checkout-key/type
+                    example: deploy-key
+                  fingerprint:
+                    type: string
+                    description: An SSH key fingerprint
+                    title: circle.http.api.v2.entities.checkout-key/fingerprint
+                    example: c9:0b:1c:4f:d5:65:56:b9:ad:88:f9:81:2b:37:74:2f
+                  preferred:
+                    type: boolean
+                    description: Indicates if this key is preferred
+                    title: circle.http.api.v2.entities.checkout-key/preferred
+                    example: true
+                  time:
+                    description: Timestamp of creation
+                    title: circle.http.api.v2.entities.checkout-key/time
+                    example: '2015-09-21T17:29:21.042Z'
+                required:
+                - public-key
+                - type
+                - fingerprint
+                - preferred
+                - time
+                title: circle.http.api.v2.entities.checkout-key/checkout-key
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-        basic_email_prefs:
-          type: string
-          enum: ["all", "smart", "none"]
-          # This is literally a map of vcs_url to {"on_dashboard": boolean, "emails": "default"}
-        projects:
-          type: object
-          example: {"https://github.com/username/my_project": {"on_dashboard": true, "emails": "smart"}}
-          additionalProperties:
-            type: object
-            properties:
-              on_dashboard:
-                type: boolean
-              emails:
-                type: string
-                enum: ["all", "smart", "none", "default"]
-        organization-prefs:
-          type: object
-          example: {"github": {"username": {"email": "username@example.com"}}}
-          additionalProperties:
-            type: object
-            additionalProperties:
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+      requestBody:
+        content:
+          application/json:
+            schema:
               type: object
               properties:
-                email:
+                type:
+                  enum:
+                  - user-key
+                  - deploy-key
                   type: string
-        sign_in_count:
-          type: number
-          format: integer
-        first_vcs_authorized_client_id:
-          type: string
-          deprecated: true
-        in_beta_program:
-          type: boolean
-        enrolled_betas:
-          type: array
-          items:
-            type: string
-        id:
-          type: string
-          format: uuid
-          description: User's CircleCI ID
-        privacy_optout:
-          type: boolean
-          description: Opt out of analytics trackers
-        containers:
-          type: number
-          format: integer
-        num_projects_followed:
-          type: number
-          format: integer
-        days_left_in_trial:
-          type: number
-          format: integer
-        all_emails:
-          type: array
-          example: ["username@example.com"]
-          items:
-            type: string
-        selected_email:
-          type: string
-          example: "username@example.com"
-        avatar_url:
-          type: string
-          example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
-        identities:
-          type: object
-          additionalProperties:
-            type: object
-            required:
-              - authorized?
-              - domain
-              - external_id
-              - id
-              - provider_id
+                  description: Either `deploy-key` or `user-key`
+                  title: checkout-key-input/type
+                  example: deploy-key
+              required:
               - type
-            properties:
-              avatar_url:
-                type: string
-                example: "https://avatars.example.com/369ea08d7172bfc72207e2ae1c1b17ef"
-              external_id:
-                anyOf:
-                  - type: string
-                  - type: number
-                example: 1234567
-              id:
-                anyOf:
-                  - type: string
-                  - type: number
-                example: 1234567
-              name:
-                type: string
-                example: "User Name"
-              user?:
-                type: boolean
-              domain:
-                type: string
-                example: "github.com"
-              type:
-                type: string
-                example: "github"
-              authorized?:
-                type: boolean
-              provider_id:
-                type: string
-                format: uuid
-              login:
-                type: string
-                example: "username"
-              student:
-                type: boolean
-                default: false
-    VcsInfo:
-      description: "Information about the VCS that hosts the project source code."
-      type: object
-      required:
-        - vcs_url
-        - provider
-        - default_branch
-      properties:
-        vcs_url:
-          description: URL to the repository hosting the project's code
+              title: circle.http.api.v2.entities.checkout-key/checkout-key-input
+  /project/{project-slug}:
+    get:
+      summary: Get a project
+      operationId: getProjectBySlug
+      responses:
+        200:
+          description: A project object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  slug:
+                    type: string
+                    description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+                    title: circle.http.api.v2.entities.project/slug
+                    example: gh/CircleCI-Public/api-preview-docs
+                  name:
+                    type: string
+                    description: The name of the project
+                    title: circle.http.api.v2.entities.project/name
+                    example: api-preview-docs
+                  organization_name:
+                    type: string
+                    description: The name of the organization the project belongs to
+                    title: circle.http.api.v2.entities.project/organization_name
+                    example: CircleCI-Public
+                  vcs_info:
+                    type: object
+                    properties:
+                      vcs_url:
+                        type: string
+                        description: URL to the repository hosting the project's code
+                        title: circle.http.api.v2.entities.vcs-info/vcs_url
+                        example: https://github.com/CircleCI-Public/api-preview-docs
+                      provider:
+                        enum:
+                        - Bitbucket
+                        - GitHub
+                        type: string
+                        description: The VCS provider
+                        title: circle.http.api.v2.entities.vcs-info/provider
+                      default_branch:
+                        type: string
+                        title: circle.http.api.v2.entities.vcs-info/default_branch
+                        example: master
+                    required:
+                    - vcs_url
+                    - provider
+                    - default_branch
+                    description: Information about the VCS that hosts the project source code.
+                    title: circle.http.api.v2.entities.vcs-info/vcs_info
+                  last_job_finish_time:
+                    description: TBD
+                    title: circle.http.api.v2.entities.project/last_job_finish_time
+                required:
+                - slug
+                - name
+                - organization_name
+                - vcs_info
+                description: 'NOTE: The definition of Project is subject to change.'
+                title: circle.http.api.v2.entities.project/project
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          example: "https://github.com/CircleCI-Public/api-preview-docs"
-        provider:
-          description: The VCS provider
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+  /project/{project-slug}/envvar/{name}:
+    delete:
+      summary: Deletes the environment variable named :name.
+      operationId: deleteEnvVar
+      responses:
+        200:
+          description: A confirmation message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A human-readable message
+                    title: circle.http.api.v2.spec.common/message
+                required:
+                - message
+                title: circle.http.api.v2.spec.common/message-response
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          enum: ["GitHub", "Bitbucket"]
-        default_branch:
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+      - in: path
+        name: name
+        description: The name of the environment variable.
+        schema:
           type: string
-          example: "master"
-    Project:
-      description: "NOTE: The definition of Project is subject to change."
-      type: object
-      required:
-        - slug
-        - name
-        - organization_name
-      properties:
-        slug:
-          description: Project slug in the form `vcs-slug/org-name/repo-name`
+        required: true
+        example: foo
+    get:
+      summary: Returns the hidden value of environment variable :name.
+      operationId: getEnvVar
+      responses:
+        200:
+          description: The environment variable.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the environment variable.
+                    title: circle.http.api.v2.entities.env-var/name
+                    example: foo
+                  value:
+                    type: string
+                    description: The value of the environment variable.
+                    title: circle.http.api.v2.entities.env-var/value
+                    example: xxxx1234
+                required:
+                - name
+                - value
+                title: circle.http.api.v2.entities.env-var/env-var
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          example: "bb/CircleCI-Public/api-preview-docs"
-        name:
-          description: The name of the project
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+      - in: path
+        name: name
+        description: The name of the environment variable.
+        schema:
           type: string
-          example: "api-preview-docs"
-        organization_name:
-          description: The name of the organization the project belongs to
+        required: true
+        example: foo
+  /project/{project-slug}/checkout-key/{fingerprint}:
+    delete:
+      summary: Deletes the checkout key.
+      operationId: deleteCheckoutKey
+      responses:
+        200:
+          description: A confirmation message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A human-readable message
+                    title: circle.http.api.v2.spec.common/message
+                required:
+                - message
+                title: circle.http.api.v2.spec.common/message-response
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          example: "CircleCI-Public"
-        vcs_info:
-          $ref: "#/components/schemas/VcsInfo"
-        last_job_finish_time:
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+      - in: path
+        name: fingerprint
+        description: An SSH key fingerprint
+        schema:
           type: string
-          format: date-time
-    TriggerPipelineRequest:
-      type: object
-      additionalProperties: false
-      properties:
-        branch:
-          description: The branch to run the new pipeline on. The HEAD commit on this branch will be used for the triggered pipeline.
+        required: true
+        example: c9:0b:1c:4f:d5:65:56:b9:ad:88:f9:81:2b:37:74:2f
+    get:
+      summary: Returns an individual checkout key.
+      operationId: getCheckoutKey
+      responses:
+        200:
+          description: The checkout key.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  public-key:
+                    type: string
+                    description: A public SSH key
+                    title: circle.http.api.v2.entities.checkout-key/public-key
+                    example: ssh-rsa ...
+                  type:
+                    enum:
+                    - deploy-key
+                    - github-user-key
+                    type: string
+                    description: Either `deploy-key` or `github-user-key`
+                    title: circle.http.api.v2.entities.checkout-key/type
+                    example: deploy-key
+                  fingerprint:
+                    type: string
+                    description: An SSH key fingerprint
+                    title: circle.http.api.v2.entities.checkout-key/fingerprint
+                    example: c9:0b:1c:4f:d5:65:56:b9:ad:88:f9:81:2b:37:74:2f
+                  preferred:
+                    type: boolean
+                    description: Indicates if this key is preferred
+                    title: circle.http.api.v2.entities.checkout-key/preferred
+                    example: true
+                  time:
+                    description: Timestamp of creation
+                    title: circle.http.api.v2.entities.checkout-key/time
+                    example: '2015-09-21T17:29:21.042Z'
+                required:
+                - public-key
+                - type
+                - fingerprint
+                - preferred
+                - time
+                title: circle.http.api.v2.entities.checkout-key/checkout-key
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          example: "feature/design-new-api"
-        tag:
-          description: A tag identifying the revision of the code that the new pipeline is to run. Note that `tag` cannot be specified with `branch`.
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+      - in: path
+        name: fingerprint
+        description: An SSH key fingerprint
+        schema:
           type: string
-          example: "v3.1.4159"
-    Pipeline:
-      description: "NOTE: The definition of Pipeline is subject to change."
-      type: object
-      required:
-        - id
-        - number
-        - organization_id
-        - project_slug
-        - created_at
-        - idempotency_key
-        - errors
-      properties:
-        id:
+        required: true
+        example: c9:0b:1c:4f:d5:65:56:b9:ad:88:f9:81:2b:37:74:2f
+  /project/{project-slug}/envvar:
+    get:
+      summary: Returns four 'x' characters plus the last four ASCII characters of the value, consistent with the display of environment variable values in the CircleCI website.
+      operationId: listEnvVars
+      responses:
+        200:
+          description: A list of environment variables.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: The name of the environment variable.
+                      title: circle.http.api.v2.entities.env-var/name
+                      example: foo
+                    value:
+                      type: string
+                      description: The value of the environment variable.
+                      title: circle.http.api.v2.entities.env-var/value
+                      example: xxxx1234
+                  required:
+                  - name
+                  - value
+                  title: circle.http.api.v2.entities.env-var/env-var
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-          format: uuid
-        number:
-          type: number
-          format: integer
-        project_slug:
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+    post:
+      summary: Creates a new environment variable.
+      operationId: createEnvVar
+      responses:
+        201:
+          description: The environment variable.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the environment variable.
+                    title: circle.http.api.v2.entities.env-var/name
+                    example: foo
+                  value:
+                    type: string
+                    description: The value of the environment variable.
+                    title: circle.http.api.v2.entities.env-var/value
+                    example: xxxx1234
+                required:
+                - name
+                - value
+                title: circle.http.api.v2.entities.env-var/env-var
+      parameters:
+      - in: path
+        name: project-slug
+        description: Project slug in the form `vcs-slug/org-name/repo-name`. The `/` characters may be URL-escaped.
+        schema:
           type: string
-        created_at:
-          type: string
-          format: date-time
-        trigger:
-          $ref: "#/components/schemas/TriggerSummary"
-        vcs:
-          description: VCS information for the pipeline
-          type: object
-          required:
-            - provider_name
-            - origin_repository_url
-            - target_repository_url
-            - revision
-          properties:
-            provider_name:
-              description: Name of the VCS provider
-              type: string
-              example: GitHub
-            origin_repository_url:
-              description: |
-                URL for the repository the trigger originated from. For fork-PR
-                pipelines this is the URL to the fork, for other pipelines the
-                `origin_` and `target_repository_url`s will be the same.
-              type: string
-              example: "https://github.com/CircleCI-Public/api-preview-docs"
-            target_repository_url:
-              description: |
-                URL for the repository the trigger targets (i.e. the repository
-                the PR will be merged into). For fork-PR pipelines this is the
-                URL to the parent repo, for other pipelines the `origin_` and
-                `target_repository_url`s will be the same.
-              type: string
-              example: "https://github.com/CircleCI-Public/api-preview-docs"
-            branch:
-              description: |
-                The branch the pipeline ran on. The HEAD commit on this branch
-                was used for the pipeline. `branch` and `tag` are mutually
-                exclusive.
-              type: string
-              example: "feature/design-new-api"
-            tag:
-              description: |
-                The tag the pipeline ran. The commit that this tag points to
-                was used for the pipeline. `branch` and `tag` are mutually
-                exclusive.
-              type: string
-              example: "v3.1.4159"
-            revision:
-              description: The revision of code that the pipeline ran.
-              type: string
-              example: f454a02b5d10fcccfd7d9dd7608a76d6493a98b4
-        idempotency_key:
-          type: string
-        #actor:
-        updated_at:
-          type: string
-          format: date-time
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              type:
-                type: string
-                enum: ["config", "plan"]
-        state:
-          type: string
-          enum: ["pending", "created", "blocked", "on_hold",
-                 "running", "canceled", "successful", "failed",
-                 "errored"]
-    Workflow:
-      type: object
-      required:
-        - id
-        - name
-        - created_at
-        - project
-        - status
-      properties:
-        id:
-          description: the workflow's unique ID.
-          type: string
-          format: uuid
-        name:
-          description: the name of the workflow, as set in `.circleci/config.yml`
-          type: string
-        created_at:
-          description: when the workflow was created.
-          type: string
-          format: date-time
-        stopped_at:
-          description: when the workflow finished running, failures of jobs can mean that the workflow stops without running all jobs.
-          type: string
-          format: date-time
-          nullable: true
-        # No pipeline entity here. Avoid cycles in the graph
-        pipeline_id:
-          description: the unique ID for the pipeline that this workflow belongs to.
-          type: string
-          format: uuid
-        pipeline_number:
-          description: the project-specific pipeline number for the pipeline that this workflow belongs to.
-          type: number
-          format: integer
-        project_slug:
-          description: "NOTE: linking workflows to projects is subject to change. The project that this workflow belongs to"
-          type: string
-        # See https://github.com/circleci/api-service/blob/master/resources/schema.edn#L52
-        status:
-          type: string
-          enum: ["unauthorized", "error", "not_run",
-                 "running", "failing", "on_hold",
-                 "canceled", "failed", "success"]
-    Job:
-      type: object
-      required:
-        - id
-        - name
-        - type
-        - status
-        - start_time
-        - dependencies
-      properties:
-        id:
-          description: the job's unique ID.
-          type: string
-          format: uuid
-        name:
-          description: the name of the job in the workflow, this may be synthesized when using job definitions from orbs.
-          type: string
-        # workflows-conductor supports
-        # :build
-        # :approval
-        type:
-          type: string
-          enum: ["build", "approval"]
-        # Full list of statuses from circle.model.build
-        # :retried
-        # :canceled
-        # :infrastructure_fail
-        # :timedout
-        # :not_run
-        # :running
-        # :failed
-        # :queued
-        # :scheduled
-        # :not_running
-        # :no_tests
-        # :fixed
-        # :success
-        status:
-          description: the job's current status.
-          type: string
-          enum: ["unauthorized", "not_run", "queued",
-                 "not_running", "running", "canceled",
-                 "infrastructure_fail", "timedout",
-                 "failed", "success", "unknown"]
-        job_number:
-          description: the job's number, corresponds to the `CIRCLE_BUILD_NUM` environment variable.
-          type: number
-          format: integer
-        start_time:
-          description: when the job started.
-          type: string
-          format: date-time
-        stop_time:
-          description: when the job finished.
-          type: string
-          format: date-time
-        dependencies:
-          description: a list of the unique job IDs for the jobs that this job depends upon in the workflow.
-          type: array
-          items:
-            type: string
-            format: uuid
-    TriggerSummary:
-      type: object
-      required:
-        - type
-        - received_at
-      properties:
-        type:
-          description: The type of the trigger
-          type: string
-          enum: ["explicit", "webhook"]
-        received_at:
-          description: The timestamp that the trigger was received at.
-          type: string
-          format: date-time
+        required: true
+        example: gh/CircleCI-Public/api-preview-docs
+        allowReserved: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the environment variable.
+                  title: circle.http.api.v2.entities.env-var/name
+                  example: foo
+                value:
+                  type: string
+                  description: The value of the environment variable.
+                  title: circle.http.api.v2.entities.env-var/value
+                  example: xxxx1234
+              required:
+              - name
+              - value
+              title: circle.http.api.v2.entities.env-var/env-var
+components:
+  securitySchemes:
+    api_key_query:
+      type: apiKey
+      name: circle-token
+      in: query
+    api_key_header:
+      type: apiKey
+      name: Circle-Token
+      in: header
+    basic_auth:
+      description: HTTP basic authentication. The username should be set as the circle-token value, and the password should be left blank.
+      type: http
+      scheme: basic

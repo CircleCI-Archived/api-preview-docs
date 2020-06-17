@@ -19,7 +19,7 @@ PREVIEWS ARE PROVIDED "AS-IS," "WITH ALL FAULTS," AND "AS AVAILABLE," AND ARE EX
 
 The CircleCI v2 API behaves very similarly to our v1.1 API. For instance, to get back basic information about the user associated with an API token in v2 you could run (assuming you have set CIRCLECI_TOKEN in your environment):
 
-`curl -u ${CIRCLECI_TOKEN} https://circleci.com/api/v2/me`
+`curl -u ${CIRCLECI_TOKEN}: https://circleci.com/api/v2/me`
 
 
 ## GETTING STARTED WITH CIRCLECI API v2

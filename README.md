@@ -17,3 +17,10 @@ We welcome your feedback on the v2 API. A few ways to reach us include:
 
 ## NEXT STEPS
 * Read the [docs](docs/) in this repository for details.
+Welcome digital service bihar seva connect akhlak
+Ahmad so juber alam
+Village akhtiarpur sarsi purnia bihar 854306
+Akhlak Ahmad digital service connect
+Vle society work code connect akhlak Ahmad
+Vle csc giving id 356332901885
+Password to get login csc digital service issue

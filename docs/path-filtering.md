@@ -91,6 +91,7 @@ The regular expressions support the full [Python re syntax](https://docs.python.
 
 You can find more information about the elements used here:
 
+-   [Setup Workflows](./setup-workflows.md)
 -   [Pipeline Variables](https://circleci.com/docs/2.0/pipeline-variables/)
 -   [Logic Statements](https://circleci.com/docs/2.0/configuration-reference/#logic-statements)
 -   [Conditional Steps](https://circleci.com/docs/2.0/reusing-config/#defining-conditional-steps)

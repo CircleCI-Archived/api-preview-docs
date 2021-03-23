@@ -66,6 +66,9 @@ Some limitations apply to setup workflows:
 - there can only be one workflow in the setup configuration
 - pipeline parameters submitted at continuation time cannot overlap
   with pipeline parameters submitted at trigger time
+- pipeline parameters declared in the setup configuration must also be
+  declared in the continuation configuration, and can be used at
+  continuation time
 
 ## Enabling Setup Workflows
 

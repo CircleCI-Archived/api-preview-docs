@@ -93,7 +93,7 @@ version: 2.1
 setup: true
 
 orbs:
-  continuation: circleci/continuation:0.1.2
+  continuation: circleci/continuation@0.1.2
 
 jobs:
   setup:

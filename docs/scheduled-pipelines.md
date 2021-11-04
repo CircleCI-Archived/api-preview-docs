@@ -107,7 +107,7 @@ daily-run-workflow:
 daily-run-workflow:
   when:
     and:
-      - equal: [ schedule, << pipeline.trigger_source >> ]
+      - equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
       - equal: [ "my schedule name", << pipeline.schedule.name >> ]
   jobs:
     - test
@@ -116,7 +116,7 @@ daily-run-workflow:
 other-workflow:
   when:
     not:
-      equal: [ schedule, << pipeline.trigger_source >> ]
+      equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
   jobs:
    - build
    - deploy

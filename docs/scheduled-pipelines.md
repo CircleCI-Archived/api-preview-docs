@@ -93,6 +93,7 @@ To migrate from scheduled workflows to scheduled pipelines, one can follow the s
           and:
             - equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
             - equal: [ "my schedule name", << pipeline.schedule.name >> ]
+            - equal: [ "main", << pipeline.git.branch >> ]
         jobs:
           - test
           - build
@@ -109,14 +110,17 @@ To migrate from scheduled workflows to scheduled pipelines, one can follow the s
       and:
         - equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
         - equal: [ "my schedule name", << pipeline.schedule.name >> ]
+        - equal: [ "main", << pipeline.git.branch >> ]
     jobs:
       - test
       - build
 
   other-workflow:
     when:
-      not:
-        equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
+      and:
+        - not:
+            equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
+        - equal: [ "main", << pipeline.git.branch >> ]
     jobs:
      - build
      - deploy

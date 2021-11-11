@@ -10,7 +10,7 @@ Since the scheduled run is based on pipelines, scheduled pipelines have all the 
 
 CircleCI has APIs that allows users to create, view, edit, and delete Scheduled Pipelines.
 
-**Note**: *At this time, the UI for Scheduled Pipelines is not available. It will become available soon.
+**Note**: *At this time, the UI for Scheduled Pipelines is not available. It will become available soon.*
 
 ## Getting started with scheduled pipelines in CircleCI
 
